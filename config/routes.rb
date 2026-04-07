@@ -11,8 +11,14 @@ Rails.application.routes.draw do
 
   get  "/list" => "lists#show", as: :list
   post "/list/clear" => "lists#clear", as: :clear_list
+  post "/list/share_token/rotate" => "lists#rotate_share_token", as: :rotate_share_token
   scope "/list" do
     resources :list_items, path: "items", only: [:create, :update, :destroy]
+  end
+
+  scope "/s/:share_token", as: :shared do
+    get "" => "shared_lists#show", as: :list
+    resources :list_items, path: "items", only: [:create, :update, :destroy], module: "shared"
   end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

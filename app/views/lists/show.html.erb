@@ -1,23 +1,37 @@
 <div>
   <div class="sticky top-0 -mx-5 px-5 pt-2 pb-4 bg-neutral-50/90 backdrop-blur z-10">
     <div class="flex items-baseline justify-between mb-4">
-      <h1 class="text-2xl font-semibold tracking-tight"><%= @list.name %></h1>
-      <% if @list_items.any? %>
-        <%= button_to "Clear", clear_list_path, method: :post,
-              form: { data: { turbo_confirm: "Clear all items?" } },
-              class: button_classes(:tertiary) %>
-      <% end %>
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight"><%= @list.name %></h1>
+        <% if local_assigns[:shared_mode] || @shared_mode %>
+          <p class="text-xs text-neutral-500 mt-1">Shared list · collaborator mode</p>
+        <% end %>
+      </div>
+      <div class="flex items-center gap-1">
+        <% unless @shared_mode %>
+          <%= link_to "Share", "#share-modal", class: button_classes(:tertiary) %>
+        <% end %>
+        <% if @list_items.any? && !@shared_mode %>
+          <%= button_to "Clear", clear_list_path, method: :post,
+                form: { data: { turbo_confirm: "Clear all items?" } },
+                class: button_classes(:tertiary) %>
+        <% end %>
+      </div>
     </div>
-    <%= render "list_items/form", list_item: @new_item %>
+    <%= render "list_items/form", list_item: @new_item, form_url: @shared_mode ? shared_list_items_path(@list.share_token) : list_items_path %>
   </div>
 
   <%= turbo_stream_from @list %>
 
-  <div id="<%= dom_id(@list, :list_items) %>" class="mt-4 space-y-2">
+  <div id="list_items" class="mt-4 space-y-2">
     <% if @list_items.any? %>
-      <%= render @list_items %>
+      <%= render partial: "list_items/list_item", collection: @list_items, as: :list_item, locals: { shared_mode: @shared_mode, share_token: @list.share_token } %>
     <% else %>
       <%= render "shared/empty_state", title: "Add your first item", hint: "Type milk, bread, eggs — anything." %>
     <% end %>
   </div>
+
+  <% unless @shared_mode %>
+    <%= render "lists/share_modal", list: @list %>
+  <% end %>
 </div>

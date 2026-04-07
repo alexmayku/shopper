@@ -1,9 +1,10 @@
 module ApplicationCable
   class Connection < ActionCable::Connection::Base
-    identified_by :current_user
+    identified_by :current_user, :collaborator_session_id
 
     def connect
-      set_current_user || reject_unauthorized_connection
+      set_current_user
+      self.collaborator_session_id = cookies.signed[:collaborator_session_id]
     end
 
     private
