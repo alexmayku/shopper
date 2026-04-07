@@ -6,6 +6,9 @@ Rails.application.routes.draw do
   resource :registration, only: [:new, :create]
   get "/signup" => "registrations#new"
 
+  resource :preferences, only: [:edit, :update]
+  delete "/preferences/tesco" => "preferences#clear_tesco_credentials", as: :clear_tesco_credentials
+
   get  "/list" => "lists#show", as: :list
   post "/list/clear" => "lists#clear", as: :clear_list
   scope "/list" do

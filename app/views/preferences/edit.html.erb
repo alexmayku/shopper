@@ -1,0 +1,49 @@
+<% content_for :wide do %>1<% end %>
+
+<div class="space-y-8">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">Preferences</h1>
+    <p class="mt-1 text-sm text-neutral-500">Signed in as <%= @user.email %></p>
+  </div>
+
+  <%= form_with model: @user, url: preferences_path, method: :patch, scope: :user, class: "space-y-8" do |form| %>
+    <section class="<%= card_classes %>">
+      <h2 class="text-lg font-semibold mb-1">Supermarket</h2>
+      <div class="text-base font-medium">Tesco</div>
+      <p class="mt-2 text-sm text-neutral-500">Waitrose · coming soon</p>
+      <p class="text-sm text-neutral-500">Sainsbury's · coming soon</p>
+    </section>
+
+    <section class="<%= card_classes %>">
+      <h2 class="text-lg font-semibold mb-3">Price range</h2>
+      <div class="inline-flex rounded-full border border-neutral-300 p-1 bg-neutral-50">
+        <% User.price_ranges.keys.each do |range| %>
+          <label class="cursor-pointer">
+            <%= form.radio_button :price_range, range, class: "peer sr-only" %>
+            <span class="block px-5 py-2 rounded-full text-sm font-medium peer-checked:bg-neutral-900 peer-checked:text-white text-neutral-700">
+              <%= range.titleize %>
+            </span>
+          </label>
+        <% end %>
+      </div>
+    </section>
+
+    <section class="<%= card_classes %>">
+      <h2 class="text-lg font-semibold mb-3">Organic</h2>
+      <label class="flex items-center justify-between">
+        <span class="text-base">Prefer organic when available</span>
+        <span class="relative inline-block">
+          <%= form.check_box :organic_preference, class: "peer sr-only" %>
+          <span class="block w-12 h-7 bg-neutral-300 rounded-full peer-checked:bg-neutral-900 transition"></span>
+          <span class="absolute top-0.5 left-0.5 w-6 h-6 bg-white rounded-full shadow transition peer-checked:translate-x-5"></span>
+        </span>
+      </label>
+    </section>
+
+    <%= render "tesco_credentials", form: form, user: @user %>
+
+    <div>
+      <%= form.submit "Save preferences", class: button_classes(:primary, extra: "w-full") %>
+    </div>
+  <% end %>
+</div>
