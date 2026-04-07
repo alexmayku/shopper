@@ -1,11 +1,13 @@
+<% password_digest = BCrypt::Password.create("password123") %>
+
 alice:
   email: alice@example.com
-  password_digest: <%= BCrypt::Password.create("password123") %>
+  password_digest: <%= password_digest %>
   subscription_status: 0
   price_range: 1
 
 bob:
   email: bob@example.com
-  password_digest: <%= BCrypt::Password.create("password123") %>
+  password_digest: <%= password_digest %>
   subscription_status: 0
   price_range: 1

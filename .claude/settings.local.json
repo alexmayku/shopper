@@ -17,7 +17,19 @@
       "Bash(bin/rails db:test:prepare)",
       "Bash(bin/rails db:system:change --to=postgresql)",
       "Bash(bin/rails db:encryption:init)",
-      "Bash(EDITOR=\"tee\" bin/rails credentials:show)"
+      "Bash(EDITOR=\"tee\" bin/rails credentials:show)",
+      "Bash(bin/rails db:drop db:create db:migrate)",
+      "Bash(bin/rails test:system)",
+      "Bash(bin/rails routes:*)",
+      "Bash(curl -sI \"http://localhost:3000/registration/new\")",
+      "Bash(bin/rails server:*)",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Macintosh; Intel Mac OS X 14_0\\) AppleWebKit/605.1.15 \\(KHTML, like Gecko\\) Version/17.0 Safari/605.1.15\" http://localhost:3000/registration/new)",
+      "Bash(pkill -f \"puma.*3000\")",
+      "Bash(curl -s -A \"Mozilla/5.0 \\(Macintosh; Intel Mac OS X 14_0\\) AppleWebKit/605.1.15 \\(KHTML, like Gecko\\) Version/17.0 Safari/605.1.15\" http://localhost:3000/registration/new -o /tmp/regnew.html)",
+      "Read(//tmp/**)",
+      "Bash(curl -v -A \"Mozilla/5.0 Safari\" http://localhost:3000/registration/new)",
+      "Bash(curl -s -A \"Mozilla/5.0 Chrome/120 Safari/537.36\" http://localhost:3001/registration/new -o /tmp/regnew.html)",
+      "Bash(xargs kill:*)"
     ]
   }
 }

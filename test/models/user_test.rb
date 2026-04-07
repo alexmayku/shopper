@@ -22,6 +22,16 @@ class UserTest < ActiveSupport::TestCase
     assert_not u.valid?
   end
 
+  test "normalizes email (downcase + strip)" do
+    u = User.new(email: " UPPER@Example.COM ", password: "password123")
+    assert_equal "upper@example.com", u.email
+  end
+
+  test "rejects short passwords" do
+    u = User.new(email: "x@example.com", password: "short")
+    assert_not u.valid?
+  end
+
   test "has_secure_password authenticates" do
     u = User.create!(email: "auth@example.com", password: "password123")
     assert u.authenticate("password123")

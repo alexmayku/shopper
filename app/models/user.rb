@@ -1,5 +1,6 @@
 class User < ApplicationRecord
   has_secure_password
+  has_many :sessions, dependent: :destroy
 
   encrypts :tesco_email
   encrypts :tesco_password
@@ -23,7 +24,10 @@ class User < ApplicationRecord
   has_many :basket_builds, dependent: :destroy
   has_many :product_matches, dependent: :destroy
 
+  normalizes :email, with: ->(e) { e.strip.downcase }
+
   validates :email, presence: true,
                     uniqueness: { case_sensitive: false },
                     format: { with: URI::MailTo::EMAIL_REGEXP }
+  validates :password, length: { minimum: 8 }, if: -> { password.present? }
 end
