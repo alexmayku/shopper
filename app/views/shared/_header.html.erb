@@ -1,0 +1,23 @@
+<% hide_on = %w[sessions registrations] %>
+<% unless hide_on.include?(controller_name) %>
+  <header class="w-full border-b border-neutral-200 bg-white">
+    <div class="mx-auto max-w-2xl flex items-center justify-between px-5 py-4">
+      <%= link_to (signed_in? ? list_path : "/"), class: "text-xl font-semibold tracking-tight" do %>
+        Kart
+      <% end %>
+
+      <% if signed_in? %>
+        <details class="relative" data-controller="dropdown">
+          <summary class="list-none cursor-pointer rounded-full bg-neutral-100 px-4 py-2 text-sm font-medium text-neutral-700 hover:bg-neutral-200">
+            Account
+          </summary>
+          <div class="absolute right-0 mt-2 w-48 rounded-2xl border border-neutral-200 bg-white shadow-lg z-10">
+            <div class="px-4 py-3 text-xs text-neutral-500 truncate"><%= current_user.email %></div>
+            <%= button_to "Sign out", session_path, method: :delete,
+                  class: "w-full text-left px-4 py-3 text-sm font-medium text-neutral-700 hover:bg-neutral-50 rounded-b-2xl" %>
+          </div>
+        </details>
+      <% end %>
+    </div>
+  </header>
+<% end %>
