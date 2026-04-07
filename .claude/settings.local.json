@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(ruby -v)",
+      "Bash(rails -v)",
+      "Bash(psql --version)",
+      "Bash(rails new:*)",
+      "Bash(bundle install:*)",
+      "Bash(bin/rails db:prepare)",
+      "Bash(bin/rails test:*)",
+      "Bash(bin/rails runner:*)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)"
+    ]
+  }
+}
