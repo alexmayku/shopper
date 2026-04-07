@@ -1,0 +1,8 @@
+alice_milk:
+  user: alice
+  freeform_text: milk
+  tesco_product_id: "12345"
+  tesco_product_name: Tesco Semi-Skimmed Milk 2L
+  tesco_product_url: https://tesco.com/p/12345
+  price_pence: 195
+  confidence: 0.92

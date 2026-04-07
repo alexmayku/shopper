@@ -1,0 +1,5 @@
+visitor_one:
+  list: alice_list
+  session_id: session_abc
+  display_name: Visitor
+  last_seen_at: <%= Time.current %>

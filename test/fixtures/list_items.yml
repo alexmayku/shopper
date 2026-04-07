@@ -1,0 +1,13 @@
+milk:
+  list: alice_list
+  freeform_text: milk
+  quantity: 2
+  position: 1
+  added_by_user: alice
+
+bread:
+  list: alice_list
+  freeform_text: bread
+  quantity: 1
+  position: 2
+  added_by_user: alice

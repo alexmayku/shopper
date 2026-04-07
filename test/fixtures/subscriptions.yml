@@ -1,0 +1,5 @@
+alice_sub:
+  user: alice
+  stripe_subscription_id: sub_alice
+  status: active
+  current_period_end: <%= 30.days.from_now %>

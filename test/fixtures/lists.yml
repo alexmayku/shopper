@@ -1,0 +1,9 @@
+alice_list:
+  owner: alice
+  name: Shopping
+  share_token: alice_share_token_aaaaaaaaaaaaaaaaaaaa
+
+bob_list:
+  owner: bob
+  name: Shopping
+  share_token: bob_share_token_bbbbbbbbbbbbbbbbbbbbbb

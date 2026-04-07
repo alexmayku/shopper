@@ -1,0 +1,6 @@
+alice_build:
+  user: alice
+  list_snapshot: <%= [{ freeform_text: "milk", quantity: 2 }].to_json %>
+  status: 0
+  progress_log: <%= [].to_json %>
+  unmatched_items: <%= [].to_json %>

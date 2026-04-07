@@ -14,7 +14,10 @@
       "Bash(bin/rails g:*)",
       "Bash(bin/rails db:migrate)",
       "Bash(bin/rails db:rollback STEP=7)",
-      "Bash(bin/rails db:test:prepare)"
+      "Bash(bin/rails db:test:prepare)",
+      "Bash(bin/rails db:system:change --to=postgresql)",
+      "Bash(bin/rails db:encryption:init)",
+      "Bash(EDITOR=\"tee\" bin/rails credentials:show)"
     ]
   }
 }
