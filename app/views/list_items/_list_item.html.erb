@@ -1,0 +1,22 @@
+<div id="<%= dom_id(list_item) %>" class="<%= card_classes(extra: "flex items-center gap-3") %>">
+  <div class="flex-1 text-base"><%= list_item.freeform_text %></div>
+
+  <div class="flex items-center gap-1">
+    <%= button_to "−", list_item_path(list_item),
+          method: :patch,
+          params: { list_item: { quantity: list_item.quantity - 1 } },
+          disabled: list_item.quantity <= 1,
+          class: "w-9 h-9 rounded-full border border-neutral-300 text-lg leading-none flex items-center justify-center disabled:opacity-30",
+          form: { class: "contents" } %>
+    <span class="w-6 text-center text-sm font-medium tabular-nums"><%= list_item.quantity %></span>
+    <%= button_to "+", list_item_path(list_item),
+          method: :patch,
+          params: { list_item: { quantity: list_item.quantity + 1 } },
+          class: "w-9 h-9 rounded-full border border-neutral-300 text-lg leading-none flex items-center justify-center",
+          form: { class: "contents" } %>
+  </div>
+
+  <%= button_to "✕", list_item_path(list_item), method: :delete,
+        class: "w-9 h-9 rounded-full text-neutral-400 hover:text-neutral-900 flex items-center justify-center",
+        form: { class: "contents" } %>
+</div>

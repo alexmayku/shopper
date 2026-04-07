@@ -20,6 +20,7 @@ class User < ApplicationRecord
   }, default: :mid
 
   has_one :list, foreign_key: :owner_user_id, dependent: :destroy
+  after_create :create_default_list
   has_one :subscription, dependent: :destroy
   has_many :basket_builds, dependent: :destroy
   has_many :product_matches, dependent: :destroy
@@ -30,4 +31,10 @@ class User < ApplicationRecord
                     uniqueness: { case_sensitive: false },
                     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
+
+  private
+
+  def create_default_list
+    create_list!(name: "Shopping")
+  end
 end

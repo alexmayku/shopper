@@ -9,6 +9,6 @@ class AuthenticationTest < ApplicationSystemTestCase
     click_on "Sign up"
 
     assert_current_path list_path
-    assert_text "Your list"
+    assert_text "Shopping"
   end
 end

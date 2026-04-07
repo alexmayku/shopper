@@ -1,4 +1,21 @@
-<div class="p-6">
-  <h1 class="text-2xl font-bold">Your list</h1>
-  <p class="mt-2 text-gray-600">Placeholder for <%= current_user&.email %>.</p>
+<div>
+  <div class="sticky top-0 -mx-5 px-5 pt-2 pb-4 bg-neutral-50/90 backdrop-blur z-10">
+    <div class="flex items-baseline justify-between mb-4">
+      <h1 class="text-2xl font-semibold tracking-tight"><%= @list.name %></h1>
+      <% if @list_items.any? %>
+        <%= button_to "Clear", clear_list_path, method: :post,
+              form: { data: { turbo_confirm: "Clear all items?" } },
+              class: button_classes(:tertiary) %>
+      <% end %>
+    </div>
+    <%= render "list_items/form", list_item: @new_item %>
+  </div>
+
+  <div id="list_items" class="mt-4 space-y-2">
+    <% if @list_items.any? %>
+      <%= render @list_items %>
+    <% else %>
+      <%= render "shared/empty_state", title: "Add your first item", hint: "Type milk, bread, eggs — anything." %>
+    <% end %>
+  </div>
 </div>

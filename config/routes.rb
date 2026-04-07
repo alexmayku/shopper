@@ -6,7 +6,11 @@ Rails.application.routes.draw do
   resource :registration, only: [:new, :create]
   get "/signup" => "registrations#new"
 
-  get "/list" => "lists#show", as: :list
+  get  "/list" => "lists#show", as: :list
+  post "/list/clear" => "lists#clear", as: :clear_list
+  scope "/list" do
+    resources :list_items, path: "items", only: [:create, :update, :destroy]
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
