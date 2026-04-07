@@ -11,7 +11,9 @@
     <%= render "list_items/form", list_item: @new_item %>
   </div>
 
-  <div id="list_items" class="mt-4 space-y-2">
+  <%= turbo_stream_from @list %>
+
+  <div id="<%= dom_id(@list, :list_items) %>" class="mt-4 space-y-2">
     <% if @list_items.any? %>
       <%= render @list_items %>
     <% else %>
