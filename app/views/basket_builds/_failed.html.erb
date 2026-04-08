@@ -1,8 +1,11 @@
 <div class="space-y-6 py-8 text-center">
   <div class="mx-auto w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center text-3xl">!</div>
-  <h1 class="text-2xl font-semibold tracking-tight">Something went wrong</h1>
+  <h1 class="text-2xl font-semibold tracking-tight">The build hit a snag</h1>
   <p class="text-sm text-neutral-500">
-    <%= basket_build.error_message.presence || "We couldn't finish building your basket." %>
+    Nothing was left in your Tesco basket.
+    <% if basket_build.error_message.present? %>
+      <span class="block mt-1 text-xs text-neutral-400"><%= basket_build.error_message %></span>
+    <% end %>
   </p>
   <%= button_to "Try again", basket_builds_path, method: :post,
         class: button_classes(:primary, extra: "w-full") %>

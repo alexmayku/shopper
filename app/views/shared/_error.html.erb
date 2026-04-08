@@ -1,0 +1,9 @@
+<div class="<%= card_classes(extra: "text-center space-y-3") %>">
+  <p class="text-base font-medium text-neutral-900"><%= local_assigns[:title] || "That didn't work." %></p>
+  <% if local_assigns[:hint] %>
+    <p class="text-sm text-neutral-500"><%= hint %></p>
+  <% end %>
+  <% if local_assigns[:retry_path] %>
+    <%= link_to "Try again", retry_path, class: button_classes(:secondary) %>
+  <% end %>
+</div>

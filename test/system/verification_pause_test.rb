@@ -41,6 +41,7 @@ class VerificationPauseTest < ApplicationSystemTestCase
     fill_in "user_password_confirmation", with: "password123"
     click_on "Sign up"
     assert_current_path list_path
+    User.find_by!(email: "verify@example.com").update!(tesco_email: "shop@tesco.com", tesco_password: "secret")
 
     fill_in "list_item_freeform_text", with: "milk"
     click_on "Add"

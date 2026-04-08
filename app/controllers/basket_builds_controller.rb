@@ -7,6 +7,12 @@ class BasketBuildsController < ApplicationController
   end
 
   def create
+    if current_user.tesco_email.blank? || current_user.tesco_password.blank?
+      return redirect_to edit_preferences_path,
+                         alert: "Let's get you signed into Tesco first.",
+                         status: :see_other
+    end
+
     unless current_user.can_build_basket?
       @prices = Kart::PRICES
       return render "basket_builds/paywall", status: :payment_required
