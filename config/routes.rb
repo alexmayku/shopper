@@ -16,9 +16,16 @@ Rails.application.routes.draw do
     resources :list_items, path: "items", only: [:create, :update, :destroy]
   end
 
+  resources :basket_builds, only: [:create, :show], path: "builds"
+
   namespace :internal do
     get  "/users/:user_id/product_matches" => "product_matches#show",   as: :user_product_matches
     post "/users/:user_id/product_matches" => "product_matches#create"
+
+    post "/builds/:id/progress"              => "basket_build_callbacks#progress",              as: :build_progress
+    post "/builds/:id/verification_required" => "basket_build_callbacks#verification_required", as: :build_verification_required
+    post "/builds/:id/completed"             => "basket_build_callbacks#completed",             as: :build_completed
+    post "/builds/:id/failed"                => "basket_build_callbacks#failed",                as: :build_failed
   end
 
   scope "/s/:share_token", as: :shared do

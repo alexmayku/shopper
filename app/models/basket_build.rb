@@ -10,8 +10,6 @@ class BasketBuild < ApplicationRecord
     cancelled: 5
   }, default: :matching
 
-  validates :list_snapshot, presence: true
-
   def append_progress(event_hash)
     self.progress_log = (progress_log || []) + [event_hash]
     save!
