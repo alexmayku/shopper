@@ -39,6 +39,35 @@ class BasketBuildsController < ApplicationController
     redirect_to @basket_build, status: :see_other
   end
 
+  def correction_picker
+    @basket_build = current_user.basket_builds.find(params[:id])
+    @freeform = params[:freeform].to_s
+    results =
+      begin
+        SidecarClient.search(@freeform)
+      rescue SidecarClient::Error
+        []
+      end
+    render partial: "basket_builds/correction_picker",
+           locals: { basket_build: @basket_build, freeform: @freeform, results: results }
+  end
+
+  def corrections
+    @basket_build = current_user.basket_builds.find(params[:id])
+    freeform = params[:freeform_text].to_s.strip
+    product_id = params[:tesco_product_id].to_s.strip
+    if freeform.blank? || product_id.blank?
+      return redirect_to @basket_build, alert: "Pick a product first.", status: :see_other
+    end
+    pm = ProductMatch.find_or_initialize_by(user_id: current_user.id, freeform_text: freeform)
+    pm.tesco_product_id   = product_id
+    pm.tesco_product_name = params[:tesco_product_name].to_s.presence || product_id
+    pm.confidence         = 1.0
+    pm.last_used_at       = Time.current
+    pm.save!
+    redirect_to @basket_build, notice: "Saved. Next time, '#{freeform}' will mean this product.", status: :see_other
+  end
+
   def existing_basket_decision
     @basket_build = current_user.basket_builds.find(params[:id])
     action = params[:decision].to_s

@@ -1,0 +1,27 @@
+<%= turbo_frame_tag "match_#{freeform.parameterize}" do %>
+  <li class="<%= card_classes(extra: "space-y-3") %>">
+    <p class="text-sm">
+      Pick the right product for "<strong><%= freeform %></strong>".
+      <span class="block text-xs text-neutral-500 mt-1">Next time, '<%= freeform %>' will mean this product.</span>
+    </p>
+    <% if results.any? %>
+      <ul class="space-y-2">
+        <% results.each do |r| %>
+          <li>
+            <%= button_to corrections_basket_build_path(basket_build,
+                  freeform_text: freeform,
+                  tesco_product_id: r["tesco_product_id"],
+                  tesco_product_name: r["name"]),
+                  method: :post,
+                  class: button_classes(:secondary, extra: "w-full text-left") do %>
+              <span class="block text-sm font-medium"><%= r["name"] %></span>
+              <span class="block text-xs text-neutral-500"><%= r["tesco_product_id"] %></span>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="text-sm text-neutral-500">No alternatives found.</p>
+    <% end %>
+  </li>
+<% end %>

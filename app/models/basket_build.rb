@@ -16,6 +16,13 @@ class BasketBuild < ApplicationRecord
     save!
   end
 
+  # Reconstruct the matched items from progress_log "added" events.
+  def matched_items
+    (progress_log || []).select { |e| e["event"] == "added" }.map do |e|
+      { "freeform" => e["freeform"], "tesco_product_id" => e["tesco_product_id"] }
+    end
+  end
+
   def existing_basket_count
     (progress_log || []).reverse.find { |e| e["event"] == "existing_basket_detected" }&.dig("item_count")
   end

@@ -11,6 +11,23 @@ class SidecarClient
     new.send_existing_basket_decision(basket_build, action)
   end
 
+  def self.search(query)
+    new.search(query)
+  end
+
+  def search(query)
+    body = { query: query }.to_json
+    sig  = OpenSSL::HMAC.hexdigest("SHA256", secret, body)
+    uri  = URI("#{base_url}/search")
+    req = Net::HTTP::Post.new(uri)
+    req["Content-Type"] = "application/json"
+    req["X-Signature"]  = sig
+    req.body = body
+    res = Net::HTTP.start(uri.host, uri.port, open_timeout: 5, read_timeout: 30) { |http| http.request(req) }
+    raise Error, "sidecar search #{res.code}: #{res.body}" unless res.code.to_i == 200
+    JSON.parse(res.body).fetch("results", [])
+  end
+
   def start_build(basket_build, callback_base_url:)
     user = basket_build.user
     payload = {

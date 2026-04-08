@@ -26,8 +26,12 @@ Rails.application.routes.draw do
     member do
       post :existing_basket_decision
       post :resume
+      post :corrections
+      get  :correction_picker
     end
   end
+
+  get "/internal/tesco/search" => "internal/tesco_search#show", as: :internal_tesco_search
 
   namespace :internal do
     get  "/users/:user_id/product_matches" => "product_matches#show",   as: :user_product_matches
