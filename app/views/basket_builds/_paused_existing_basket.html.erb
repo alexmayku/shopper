@@ -1,0 +1,17 @@
+<% count = basket_build.existing_basket_count || 0 %>
+<div class="space-y-6 py-8">
+  <div class="text-center space-y-2">
+    <div class="mx-auto w-16 h-16 rounded-full bg-amber-500 text-white flex items-center justify-center text-3xl">!</div>
+    <h1 class="text-2xl font-semibold tracking-tight">You've got <%= count %> item<%= "s" if count != 1 %> in your Tesco basket already</h1>
+    <p class="text-sm text-neutral-500">What would you like us to do?</p>
+  </div>
+
+  <div class="space-y-3">
+    <%= button_to "Replace — start fresh", existing_basket_decision_basket_build_path(basket_build, decision: "replace"),
+          method: :post, class: button_classes(:primary, extra: "w-full") %>
+    <%= button_to "Merge — add to what's there", existing_basket_decision_basket_build_path(basket_build, decision: "merge"),
+          method: :post, class: button_classes(:secondary, extra: "w-full") %>
+    <%= button_to "Cancel build", existing_basket_decision_basket_build_path(basket_build, decision: "cancel"),
+          method: :post, class: button_classes(:tertiary, extra: "w-full") %>
+  </div>
+</div>

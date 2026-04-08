@@ -14,6 +14,13 @@ class Internal::BasketBuildCallbacksController < ApplicationController
     head :ok
   end
 
+  def existing_basket_detected
+    @build.update!(status: :paused_existing_basket)
+    @build.append_progress({ "event" => "existing_basket_detected", "item_count" => params[:item_count].to_i, "at" => Time.current.to_s })
+    rebroadcast_status
+    head :ok
+  end
+
   def verification_required
     @build.update!(status: :paused_verification)
     @build.append_progress({ "event" => "verification_required", "at" => Time.current })

@@ -22,6 +22,18 @@ class BasketBuildsController < ApplicationController
     redirect_to @basket_build, status: :see_other
   end
 
+  def existing_basket_decision
+    @basket_build = current_user.basket_builds.find(params[:id])
+    action = params[:decision].to_s
+    unless %w[replace merge cancel].include?(action)
+      return redirect_to @basket_build, alert: "Invalid choice.", status: :see_other
+    end
+    SidecarClient.send_existing_basket_decision(@basket_build, action)
+    @basket_build.append_progress({ "event" => "decision_sent", "decision" => action, "at" => Time.current.to_s })
+    @basket_build.update!(status: :building) unless action == "cancel"
+    redirect_to @basket_build, status: :see_other
+  end
+
   private
 
   def callback_base_url

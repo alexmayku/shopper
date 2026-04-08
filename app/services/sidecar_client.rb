@@ -7,6 +7,10 @@ class SidecarClient
     new.start_build(basket_build, callback_base_url: callback_base_url)
   end
 
+  def self.send_existing_basket_decision(basket_build, action)
+    new.send_existing_basket_decision(basket_build, action)
+  end
+
   def start_build(basket_build, callback_base_url:)
     user = basket_build.user
     payload = {
@@ -35,6 +39,21 @@ class SidecarClient
     end
     unless res.code.to_i == 202
       raise Error, "sidecar #{res.code}: #{res.body}"
+    end
+    true
+  end
+
+  def send_existing_basket_decision(basket_build, action)
+    body = { action: action }.to_json
+    sig  = OpenSSL::HMAC.hexdigest("SHA256", secret, body)
+    uri  = URI("#{base_url}/build/#{basket_build.id}/resume")
+    req = Net::HTTP::Post.new(uri)
+    req["Content-Type"] = "application/json"
+    req["X-Signature"]  = sig
+    req.body = body
+    res = Net::HTTP.start(uri.host, uri.port, open_timeout: 5, read_timeout: 10) { |http| http.request(req) }
+    unless res.code.to_i == 202
+      raise Error, "sidecar resume #{res.code}: #{res.body}"
     end
     true
   end

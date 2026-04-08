@@ -16,12 +16,15 @@ Rails.application.routes.draw do
     resources :list_items, path: "items", only: [:create, :update, :destroy]
   end
 
-  resources :basket_builds, only: [:create, :show], path: "builds"
+  resources :basket_builds, only: [:create, :show], path: "builds" do
+    member { post :existing_basket_decision }
+  end
 
   namespace :internal do
     get  "/users/:user_id/product_matches" => "product_matches#show",   as: :user_product_matches
     post "/users/:user_id/product_matches" => "product_matches#create"
 
+    post "/builds/:id/existing_basket_detected" => "basket_build_callbacks#existing_basket_detected", as: :build_existing_basket_detected
     post "/builds/:id/progress"              => "basket_build_callbacks#progress",              as: :build_progress
     post "/builds/:id/verification_required" => "basket_build_callbacks#verification_required", as: :build_verification_required
     post "/builds/:id/completed"             => "basket_build_callbacks#completed",             as: :build_completed

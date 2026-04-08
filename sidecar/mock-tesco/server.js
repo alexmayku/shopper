@@ -42,16 +42,37 @@ export function buildMockTesco() {
 
   // In-memory session store, keyed by the session cookie set on login.
   const sessions = new Map();
+  // Items every new session is pre-seeded with. Set via /__test/preseed.
+  const globalPreseed = [];
 
   function ensureSession(request, reply) {
     let sid = request.cookies?.mock_tesco_sid;
     if (!sid || !sessions.has(sid)) {
       sid = crypto.randomBytes(12).toString("hex");
-      sessions.set(sid, { authed: false, basket: { id: crypto.randomBytes(6).toString("hex"), items: [] } });
+      sessions.set(sid, {
+        authed: false,
+        basket: {
+          id: crypto.randomBytes(6).toString("hex"),
+          items: globalPreseed.map((line) => ({ ...line })),
+        },
+      });
       reply.setCookie("mock_tesco_sid", sid, { path: "/", httpOnly: true });
     }
     return sessions.get(sid);
   }
+
+  fastify.post("/__test/preseed", async (request, reply) => {
+    const { items = [] } = request.body ?? {};
+    globalPreseed.length = 0;
+    for (const item of items) globalPreseed.push(item);
+    return reply.send({ ok: true, preseed: globalPreseed });
+  });
+
+  fastify.post("/__test/reset", async (_req, reply) => {
+    globalPreseed.length = 0;
+    sessions.clear();
+    return reply.send({ ok: true });
+  });
 
   fastify.get("/", async (request, reply) => {
     ensureSession(request, reply);
@@ -121,6 +142,21 @@ export function buildMockTesco() {
     const existing = session.basket.items.find((i) => i.product_id === product_id);
     if (existing) existing.quantity += qty;
     else session.basket.items.push({ product_id, quantity: qty });
+    reply.redirect("/basket");
+  });
+
+  // Test helper: pre-populate the basket with one item before login.
+  fastify.post("/__test/seed_basket", async (request, reply) => {
+    const session = ensureSession(request, reply);
+    const { product_id = "p001", quantity = 1 } = request.body ?? {};
+    if (!findProduct(product_id)) return reply.code(404).send("Unknown product");
+    session.basket.items.push({ product_id, quantity: parseInt(quantity, 10) });
+    return reply.send({ ok: true });
+  });
+
+  fastify.get("/basket/clear", async (request, reply) => {
+    const session = ensureSession(request, reply);
+    session.basket.items = [];
     reply.redirect("/basket");
   });
 

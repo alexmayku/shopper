@@ -3,13 +3,41 @@ import { login } from "./tesco/login.js";
 import { search } from "./tesco/search.js";
 import { addToBasket } from "./tesco/add_to_basket.js";
 import { goToCheckout } from "./tesco/checkout.js";
+import { checkExistingBasket, emptyBasket } from "./tesco/check_existing_basket.js";
 import { postToRails } from "./rails-callback.js";
 
-// matchItem(searchResults, item) → { tesco_product_id, confidence } | null
 // Default fallback when no LLM-backed matcher is supplied: pick the first search result.
 function defaultMatcher(searchResults /* , item */) {
   if (!searchResults?.length) return null;
   return { tesco_product_id: searchResults[0].tesco_product_id, confidence: 1.0 };
+}
+
+// In-process registry of paused builds awaiting a user decision. The Fastify
+// /build/:id/resume route resolves the matching promise.
+const pendingDecisions = new Map();
+
+export function resolveExistingBasketDecision(buildId, action) {
+  const entry = pendingDecisions.get(buildId);
+  if (!entry) return false;
+  pendingDecisions.delete(buildId);
+  entry.resolve(action);
+  return true;
+}
+
+function awaitDecision(buildId, { timeoutMs = 30 * 60 * 1000 } = {}) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      pendingDecisions.delete(buildId);
+      reject(new Error("decision_timeout"));
+    }, timeoutMs);
+    pendingDecisions.set(buildId, {
+      resolve: (action) => {
+        clearTimeout(timer);
+        resolve(action);
+      },
+      reject,
+    });
+  });
 }
 
 export async function runBuild({
@@ -22,6 +50,7 @@ export async function runBuild({
   hmacSecret,
   matcher = defaultMatcher,
   proxy,
+  existingBasketDecisionTimeoutMs,
 }) {
   const callbackUrl = (suffix) => `${railsCallbackBase}/internal/builds/${buildId}/${suffix}`;
   const post = (suffix, body) =>
@@ -43,10 +72,33 @@ export async function runBuild({
     }
     await post("progress", { build_id: buildId, event: "logged_in" });
 
+    // Pre-build basket check: pause for a user decision if items already present.
+    const { itemCount } = await checkExistingBasket(page, { baseUrl });
+    if (itemCount > 0) {
+      await post("existing_basket_detected", { build_id: buildId, item_count: itemCount });
+      let decision;
+      try {
+        decision = await awaitDecision(buildId, { timeoutMs: existingBasketDecisionTimeoutMs });
+      } catch (_e) {
+        await post("failed", { build_id: buildId, error_message: "existing_basket_decision_timeout" });
+        return { status: "failed", reason: "decision_timeout" };
+      }
+      if (decision === "cancel") {
+        await post("failed", { build_id: buildId, error_message: "cancelled_by_user" });
+        return { status: "cancelled" };
+      }
+      if (decision === "replace") {
+        await emptyBasket(page, { baseUrl });
+        await post("progress", { build_id: buildId, event: "basket_replaced" });
+      } else {
+        await post("progress", { build_id: buildId, event: "basket_merged" });
+      }
+    }
+
     for (const item of items) {
       try {
         const results = await search(page, { baseUrl, query: item.freeform });
-        const match = matcher(results, item);
+        const match = await matcher(results, item);
         if (!match) {
           unmatched.push({ freeform: item.freeform, reason: "no_results" });
           await post("progress", { build_id: buildId, event: "unmatched", freeform: item.freeform });
