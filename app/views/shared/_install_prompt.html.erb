@@ -1,0 +1,16 @@
+<div class="hidden fixed bottom-4 inset-x-4 z-30"
+     data-controller="install-prompt"
+     data-install-prompt-item-count-value="<%= local_assigns.fetch(:item_count, 0) %>">
+  <div class="<%= card_classes(extra: "flex items-center justify-between gap-3 shadow-lg") %>">
+    <div class="text-sm">
+      <p class="font-medium">Install Kart</p>
+      <p class="text-xs text-neutral-500">Add to your home screen for faster access.</p>
+    </div>
+    <div class="flex gap-1">
+      <button type="button" data-action="install-prompt#install"
+              class="<%= button_classes(:primary, extra: "px-4 py-2 text-sm") %>">Install</button>
+      <button type="button" data-action="install-prompt#dismiss"
+              class="<%= button_classes(:tertiary, extra: "px-3 py-2 text-sm") %>">Not now</button>
+    </div>
+  </div>
+</div>

@@ -39,5 +39,6 @@
 
   <% unless @shared_mode %>
     <%= render "lists/share_modal", list: @list %>
+    <%= render "shared/install_prompt", item_count: @list_items.size %>
   <% end %>
 </div>
