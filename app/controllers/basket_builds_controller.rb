@@ -3,6 +3,7 @@ class BasketBuildsController < ApplicationController
 
   def show
     @basket_build = current_user.basket_builds.find(params[:id])
+    BasketBuildChannel.mark_connected(@basket_build.id)
   end
 
   def create

@@ -34,6 +34,30 @@ class Internal::BasketBuildCallbacksControllerTest < ActionDispatch::Integration
     assert_equal "paused_verification", @build.reload.status
   end
 
+  test "completed sends ready email when no browser is connected" do
+    Rails.cache.delete(BasketBuildChannel.cache_key(@build.id))
+    body = { tesco_checkout_url: "http://x", total_pence: 1, unmatched_items: [] }.to_json
+    assert_emails 1 do
+      perform_enqueued_jobs do
+        post internal_build_completed_path(@build),
+             params: body,
+             headers: { "X-Signature" => sig(body), "Content-Type" => "application/json" }
+      end
+    end
+  end
+
+  test "completed does not send ready email when a browser is connected" do
+    BasketBuildChannel.mark_connected(@build.id)
+    body = { tesco_checkout_url: "http://x", total_pence: 1, unmatched_items: [] }.to_json
+    assert_emails 0 do
+      perform_enqueued_jobs do
+        post internal_build_completed_path(@build),
+             params: body,
+             headers: { "X-Signature" => sig(body), "Content-Type" => "application/json" }
+      end
+    end
+  end
+
   test "completed populates checkout url, total, unmatched, status ready" do
     body = {
       tesco_checkout_url: "http://localhost:4002/checkout/abc123",

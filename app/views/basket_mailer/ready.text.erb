@@ -1,0 +1,5 @@
+Your Tesco basket is ready.
+
+<% if @basket_build.total_pence %>Total: £<%= format("%.2f", @basket_build.total_pence / 100.0) %><% end %>
+
+Open it: <%= @build_url %>

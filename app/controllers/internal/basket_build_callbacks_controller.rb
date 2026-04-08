@@ -37,6 +37,7 @@ class Internal::BasketBuildCallbacksController < ApplicationController
       completed_at: Time.current,
     )
     rebroadcast_status
+    SendBasketReadyEmailJob.perform_later(@build.id) unless BasketBuildChannel.connected?(@build.id)
     head :ok
   end
 

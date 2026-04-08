@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+<body style="font-family: -apple-system, system-ui, sans-serif; background: #fafafa; margin: 0; padding: 32px;">
+  <div style="max-width: 480px; margin: 0 auto; background: white; border-radius: 16px; padding: 32px; border: 1px solid #e5e5e5;">
+    <h1 style="font-size: 24px; margin: 0 0 8px;">Your Tesco basket is ready</h1>
+    <p style="color: #525252; font-size: 16px; line-height: 1.5; margin: 0 0 24px;">
+      We've finished building your basket on Tesco. Open it to review and check out.
+    </p>
+    <% if @basket_build.total_pence %>
+      <p style="font-size: 28px; font-weight: 600; margin: 0 0 24px;">
+        £<%= format("%.2f", @basket_build.total_pence / 100.0) %>
+      </p>
+    <% end %>
+    <a href="<%= @build_url %>"
+       style="display: inline-block; background: #171717; color: white; text-decoration: none; padding: 16px 24px; border-radius: 999px; font-weight: 600;">
+      Open my basket
+    </a>
+  </div>
+</body>
+</html>
