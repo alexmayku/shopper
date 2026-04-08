@@ -1,0 +1,24 @@
+<div class="space-y-6 py-4">
+  <h1 class="text-2xl font-semibold tracking-tight">Billing</h1>
+
+  <% if @subscription&.active? %>
+    <div class="<%= card_classes %>">
+      <p class="text-sm text-neutral-500">Current plan</p>
+      <p class="text-lg font-semibold mt-1">Active — <%= @subscription.status %></p>
+      <% if @subscription.current_period_end %>
+        <p class="text-sm text-neutral-500 mt-1">Renews <%= @subscription.current_period_end.to_date %></p>
+      <% end %>
+    </div>
+    <%= button_to "Manage subscription", portal_billing_path, method: :get,
+          class: button_classes(:primary, extra: "w-full") %>
+  <% else %>
+    <div class="<%= card_classes %>">
+      <p class="text-base">Unlock unlimited Tesco baskets.</p>
+      <p class="text-sm text-neutral-500 mt-1">Cancel anytime.</p>
+    </div>
+    <%= button_to "Subscribe monthly", checkout_billing_path(plan: "monthly"), method: :post,
+          class: button_classes(:primary, extra: "w-full") %>
+    <%= button_to "Subscribe annually", checkout_billing_path(plan: "annual"), method: :post,
+          class: button_classes(:secondary, extra: "w-full") %>
+  <% end %>
+</div>

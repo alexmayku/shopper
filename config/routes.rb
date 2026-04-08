@@ -16,6 +16,10 @@ Rails.application.routes.draw do
     resources :list_items, path: "items", only: [:create, :update, :destroy]
   end
 
+  get  "/billing"          => "billing#show",     as: :billing
+  post "/billing/checkout" => "billing#checkout", as: :checkout_billing
+  get  "/billing/portal"   => "billing#portal",   as: :portal_billing
+
   resources :basket_builds, only: [:create, :show], path: "builds" do
     member do
       post :existing_basket_decision
