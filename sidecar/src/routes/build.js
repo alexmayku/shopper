@@ -17,6 +17,13 @@ export default async function buildRoutes(fastify, opts) {
   fastify.post("/build", async (request, reply) => {
     if (!checkSig(request, reply)) return;
     const payload = request.body ?? {};
+    const proxy = process.env.PROXY_PROVIDER_HOST
+      ? {
+          server: process.env.PROXY_PROVIDER_HOST,
+          username: process.env.PROXY_PROVIDER_USER,
+          password: process.env.PROXY_PROVIDER_PASS,
+        }
+      : undefined;
     runBuild({
       buildId: payload.buildId,
       tescoEmail: payload.tescoEmail,
@@ -24,6 +31,7 @@ export default async function buildRoutes(fastify, opts) {
       items: payload.items ?? [],
       railsCallbackBase: payload.railsCallbackBase,
       hmacSecret: secret,
+      proxy,
     }).catch((err) => fastify.log?.error?.(err));
     return reply.code(202).send({ accepted: true, buildId: payload.buildId });
   });

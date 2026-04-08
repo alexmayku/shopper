@@ -41,8 +41,8 @@ env:
   clear:
     APP_HOST: https://<%= ENV.fetch("KART_HOST", "staging.kart.app") %>
     SIDECAR_URL: http://kart-sidecar:4001
-    TESCO_BASE_URL: http://kart-sidecar:4002
-    TESCO_MODE: mock
+    TESCO_BASE_URL: <%= ENV.fetch("TESCO_BASE_URL", "http://kart-sidecar:4002") %>
+    TESCO_MODE: <%= ENV.fetch("TESCO_MODE", "mock") %>
     SOLID_QUEUE_IN_PUMA: false
     DB_HOST: kart-db
   secret:
@@ -56,6 +56,9 @@ env:
     - STRIPE_PRICE_ID_ANNUAL
     - RESEND_API_KEY
     - SIDECAR_HMAC_SECRET
+    - PROXY_PROVIDER_USER
+    - PROXY_PROVIDER_PASS
+    - PROXY_PROVIDER_HOST
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
@@ -89,3 +92,31 @@ accessories:
 hooks:
   post-deploy:
     - kamal app exec --reuse "bin/rails db:prepare"
+
+# `kamal -d production deploy` switches to the live host, real Tesco, and live
+# Stripe. Everything else (image, services, accessories, secrets list) is
+# inherited from the top-level config. The runbook (docs/runbook.md) covers
+# the full pre-launch sequence.
+destinations:
+  production:
+    servers:
+      web:
+        hosts:
+          - <%= ENV.fetch("KART_PROD_WEB_HOST", "PROD_IP") %>
+      worker:
+        hosts:
+          - <%= ENV.fetch("KART_PROD_WEB_HOST", "PROD_IP") %>
+      sidecar:
+        hosts:
+          - <%= ENV.fetch("KART_PROD_WEB_HOST", "PROD_IP") %>
+    proxy:
+      ssl: true
+      host: <%= ENV.fetch("KART_PROD_HOST", "kart.app") %>
+      app_port: 3000
+    env:
+      clear:
+        APP_HOST: https://<%= ENV.fetch("KART_PROD_HOST", "kart.app") %>
+        TESCO_MODE: live
+        TESCO_BASE_URL: https://www.tesco.com
+        SOLID_QUEUE_IN_PUMA: false
+        DB_HOST: kart-db

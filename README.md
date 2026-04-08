@@ -57,6 +57,16 @@ The post-deploy hook runs `bin/rails db:prepare`. Useful aliases:
 - `bin/kamal console` — Rails console on the live container
 - `bin/kamal migrate` — run migrations on demand
 
+## Production
+
+```
+kamal -d production deploy
+```
+
+Production runs against real tesco.com via a residential proxy and live Stripe. Required extra env vars: `KART_PROD_WEB_HOST`, `KART_PROD_HOST`, `PROXY_PROVIDER_USER`, `PROXY_PROVIDER_PASS`, `PROXY_PROVIDER_HOST`, plus the `KART_PROD_*`-prefixed equivalents of every secret in `.kamal/secrets.production`.
+
+Full operational reference, runbook, and the pre-launch checklist are in [`docs/runbook.md`](docs/runbook.md).
+
 ### Stripe webhooks in dev
 
 ```
