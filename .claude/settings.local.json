@@ -29,7 +29,10 @@
       "Read(//tmp/**)",
       "Bash(curl -v -A \"Mozilla/5.0 Safari\" http://localhost:3000/registration/new)",
       "Bash(curl -s -A \"Mozilla/5.0 Chrome/120 Safari/537.36\" http://localhost:3001/registration/new -o /tmp/regnew.html)",
-      "Bash(xargs kill:*)"
+      "Bash(xargs kill:*)",
+      "Bash(npm -v)",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)"
     ]
   }
 }

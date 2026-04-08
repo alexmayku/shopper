@@ -1,2 +1,4 @@
 web: bin/rails server
+worker: bin/jobs
 css: bin/rails tailwindcss:watch
+sidecar: cd sidecar && npm run dev
