@@ -16,6 +16,8 @@ Rails.application.routes.draw do
     resources :list_items, path: "items", only: [:create, :update, :destroy]
   end
 
+  post "/webhooks/stripe"  => "webhooks/stripe#create"
+
   get  "/billing"          => "billing#show",     as: :billing
   post "/billing/checkout" => "billing#checkout", as: :checkout_billing
   get  "/billing/portal"   => "billing#portal",   as: :portal_billing
