@@ -32,6 +32,14 @@ class User < ApplicationRecord
                     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
 
+  def subscription_active?
+    subscription&.active? == true
+  end
+
+  def can_build_basket?
+    subscription_active? || !trial_used?
+  end
+
   private
 
   def create_default_list

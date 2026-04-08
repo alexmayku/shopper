@@ -1,0 +1,19 @@
+<div class="space-y-8 py-8 text-center">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">Your first basket was on us</h1>
+    <p class="mt-2 text-sm text-neutral-500">Upgrade to keep the magic. Cancel anytime.</p>
+  </div>
+
+  <div class="space-y-3">
+    <%= button_to checkout_billing_path(plan: "monthly"), method: :post,
+          class: button_classes(:primary, extra: "w-full") do %>
+      <%= @prices[:monthly][:label] %> · <%= @prices[:monthly][:price] %>
+    <% end %>
+    <%= button_to checkout_billing_path(plan: "annual"), method: :post,
+          class: button_classes(:secondary, extra: "w-full") do %>
+      <%= @prices[:annual][:label] %> · <%= @prices[:annual][:price] %>
+    <% end %>
+  </div>
+
+  <%= link_to "Back to list", list_path, class: button_classes(:tertiary) %>
+</div>

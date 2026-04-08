@@ -36,6 +36,7 @@ class Internal::BasketBuildCallbacksController < ApplicationController
       unmatched_items: Array(params[:unmatched_items]),
       completed_at: Time.current,
     )
+    @build.user.update!(trial_used: true) unless @build.user.trial_used?
     rebroadcast_status
     SendBasketReadyEmailJob.perform_later(@build.id) unless BasketBuildChannel.connected?(@build.id)
     head :ok

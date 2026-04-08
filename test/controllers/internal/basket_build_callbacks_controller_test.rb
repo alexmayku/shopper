@@ -58,6 +58,15 @@ class Internal::BasketBuildCallbacksControllerTest < ActionDispatch::Integration
     end
   end
 
+  test "completed flips user.trial_used to true" do
+    @user.update!(trial_used: false)
+    body = { tesco_checkout_url: "http://x", total_pence: 1, unmatched_items: [] }.to_json
+    post internal_build_completed_path(@build),
+         params: body,
+         headers: { "X-Signature" => sig(body), "Content-Type" => "application/json" }
+    assert @user.reload.trial_used?
+  end
+
   test "completed populates checkout url, total, unmatched, status ready" do
     body = {
       tesco_checkout_url: "http://localhost:4002/checkout/abc123",

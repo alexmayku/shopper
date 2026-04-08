@@ -43,6 +43,39 @@ class BasketBuildsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "renders paywall and skips enqueue when trial used and not subscribed" do
+    @user.update!(trial_used: true)
+    @user.subscription&.destroy
+
+    assert_no_difference "BasketBuild.count" do
+      post basket_builds_path
+    end
+    assert_response :payment_required
+    assert_match "Your first basket was on us", @response.body
+    assert_empty @captured_sidecar_calls
+  end
+
+  test "active subscriber can build even after trial used" do
+    @user.update!(trial_used: true)
+    sub = @user.subscription || @user.create_subscription!(stripe_subscription_id: "x")
+    sub.update!(status: "active")
+
+    assert_difference "BasketBuild.count", 1 do
+      post basket_builds_path
+    end
+    assert_redirected_to basket_build_path(BasketBuild.order(:id).last)
+  end
+
+  test "first build is free even without subscription" do
+    @user.update!(trial_used: false)
+    @user.subscription&.destroy
+
+    assert_difference "BasketBuild.count", 1 do
+      post basket_builds_path
+    end
+    assert_redirected_to basket_build_path(BasketBuild.order(:id).last)
+  end
+
   test "create requires login" do
     delete session_path
     post basket_builds_path

@@ -33,7 +33,8 @@
       "Bash(npm -v)",
       "Bash(npm install:*)",
       "Bash(npm test:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -7,6 +7,11 @@ class BasketBuildsController < ApplicationController
   end
 
   def create
+    unless current_user.can_build_basket?
+      @prices = Kart::PRICES
+      return render "basket_builds/paywall", status: :payment_required
+    end
+
     list = current_user.list
     snapshot = list.list_items.order(:position).map do |item|
       { freeform: item.freeform_text, quantity: item.quantity }
