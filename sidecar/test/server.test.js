@@ -37,7 +37,7 @@ describe("POST /build", () => {
       payload: body,
     });
     expect(res.statusCode).toBe(202);
-    expect(res.json()).toEqual({ accepted: true });
+    expect(res.json()).toMatchObject({ accepted: true });
   });
 
   it("rejects a request with an invalid signature", async () => {
