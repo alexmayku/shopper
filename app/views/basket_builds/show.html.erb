@@ -1,4 +1,5 @@
-<div class="space-y-4">
-  <h1 class="text-2xl font-semibold tracking-tight">Build #<%= @basket_build.id %></h1>
-  <p class="text-sm text-neutral-500">Status: <%= @basket_build.status %></p>
+<%= turbo_stream_from @basket_build %>
+
+<div id="<%= dom_id(@basket_build, :status) %>">
+  <%= render "basket_builds/#{@basket_build.status}", basket_build: @basket_build %>
 </div>

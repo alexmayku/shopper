@@ -1,0 +1,9 @@
+<div class="text-center py-16 space-y-4">
+  <div class="mx-auto w-12 h-12 rounded-full border-4 border-neutral-200 border-t-neutral-900 animate-spin"></div>
+  <h1 class="text-2xl font-semibold tracking-tight">Matching your items…</h1>
+  <% total = basket_build.list_snapshot.size %>
+  <% done  = (basket_build.progress_log || []).count { |e| %w[added unmatched].include?(e["event"]) } %>
+  <p class="text-sm text-neutral-500" data-testid="match-progress">
+    <%= done %> of <%= total %>
+  </p>
+</div>

@@ -1,0 +1,16 @@
+<%
+  is_owner = local_assigns[:is_owner]
+  owner_email = local_assigns[:owner_email]
+%>
+<div class="sticky bottom-4 mt-8">
+  <% if is_owner %>
+    <%= button_to "Add to Tesco basket", basket_builds_path, method: :post,
+          class: button_classes(:primary, extra: "w-full shadow-lg") %>
+  <% else %>
+    <button type="button" disabled
+            title="Only <%= owner_email %> can checkout"
+            class="<%= button_classes(:primary, extra: "w-full shadow-lg") %>">
+      Only <%= owner_email %> can checkout
+    </button>
+  <% end %>
+</div>

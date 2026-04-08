@@ -1,0 +1,23 @@
+<div class="space-y-6">
+  <div class="text-center space-y-2">
+    <div class="mx-auto w-12 h-12 rounded-full border-4 border-neutral-200 border-t-neutral-900 animate-spin"></div>
+    <h1 class="text-2xl font-semibold tracking-tight">Building your basket…</h1>
+    <p class="text-sm text-neutral-500">Keep this page open — or close it and we'll email you when it's ready.</p>
+  </div>
+
+  <ul class="space-y-2">
+    <% (basket_build.progress_log || []).each do |event| %>
+      <% next unless %w[added unmatched item_error].include?(event["event"]) %>
+      <li class="<%= card_classes(extra: "flex items-center gap-3") %>">
+        <span class="text-sm">
+          <%= { "added" => "✓", "unmatched" => "—" }.fetch(event["event"], "!") %>
+        </span>
+        <span class="text-sm flex-1"><%= event["freeform"] %></span>
+      </li>
+    <% end %>
+  </ul>
+
+  <p class="text-xs text-neutral-400 text-center">
+    Your Tesco password is encrypted and only used inside the worker that builds this basket.
+  </p>
+</div>

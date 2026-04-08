@@ -1,0 +1,10 @@
+<div class="space-y-6 py-8 text-center">
+  <div class="mx-auto w-16 h-16 rounded-full bg-red-500 text-white flex items-center justify-center text-3xl">!</div>
+  <h1 class="text-2xl font-semibold tracking-tight">Something went wrong</h1>
+  <p class="text-sm text-neutral-500">
+    <%= basket_build.error_message.presence || "We couldn't finish building your basket." %>
+  </p>
+  <%= button_to "Try again", basket_builds_path, method: :post,
+        class: button_classes(:primary, extra: "w-full") %>
+  <%= link_to "Back to list", list_path, class: button_classes(:tertiary) %>
+</div>

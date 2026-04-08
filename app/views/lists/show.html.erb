@@ -31,6 +31,12 @@
     <% end %>
   </div>
 
+  <% if @list_items.any? %>
+    <%= render "lists/add_to_basket_cta",
+          is_owner: !@shared_mode,
+          owner_email: @list.owner.email %>
+  <% end %>
+
   <% unless @shared_mode %>
     <%= render "lists/share_modal", list: @list %>
   <% end %>

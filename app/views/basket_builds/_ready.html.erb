@@ -1,0 +1,25 @@
+<div class="space-y-6 py-8 text-center">
+  <div class="mx-auto w-16 h-16 rounded-full bg-emerald-500 text-white flex items-center justify-center text-3xl">✓</div>
+  <h1 class="text-2xl font-semibold tracking-tight">Your Tesco basket is ready</h1>
+  <% if basket_build.total_pence %>
+    <p class="text-3xl font-semibold">£<%= format("%.2f", basket_build.total_pence / 100.0) %></p>
+  <% end %>
+  <p class="text-sm text-neutral-500"><%= basket_build.list_snapshot.size %> items</p>
+
+  <div>
+    <%= link_to "Go to Tesco checkout", basket_build.tesco_checkout_url,
+          class: button_classes(:primary, extra: "w-full"),
+          target: "_blank", rel: "noopener" %>
+  </div>
+
+  <% if basket_build.unmatched_items.present? %>
+    <div class="text-left">
+      <p class="text-sm font-medium text-neutral-700 mb-2">Couldn't find:</p>
+      <ul class="space-y-1 text-sm text-neutral-500">
+        <% basket_build.unmatched_items.each do |item| %>
+          <li>· <%= item["freeform"] || item[:freeform] %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</div>

@@ -34,7 +34,7 @@ class BasketBuildsControllerTest < ActionDispatch::IntegrationTest
     build = @user.basket_builds.create!(list_snapshot: [], status: :matching)
     get basket_build_path(build)
     assert_response :success
-    assert_match "Build ##{build.id}", @response.body
+    assert_match "Matching your items", @response.body
   end
 
   test "show 404s for another user's build" do
