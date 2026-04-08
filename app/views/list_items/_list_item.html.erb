@@ -4,6 +4,8 @@
   item_url = shared_mode ? shared_list_item_path(share_token, list_item) : list_item_path(list_item)
 %>
 <div id="<%= dom_id(list_item) %>" class="<%= card_classes(extra: "flex items-center gap-3") %>">
+  <span class="attribution-dot inline-block w-2.5 h-2.5 rounded-full <%= attribution_color_for(list_item) %>"
+        title="<%= attribution_label_for(list_item, viewer: local_assigns[:viewer]) %>"></span>
   <div class="flex-1 text-base"><%= list_item.freeform_text %></div>
 
   <div class="flex items-center gap-1">
