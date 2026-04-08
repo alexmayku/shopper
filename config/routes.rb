@@ -16,6 +16,11 @@ Rails.application.routes.draw do
     resources :list_items, path: "items", only: [:create, :update, :destroy]
   end
 
+  namespace :internal do
+    get  "/users/:user_id/product_matches" => "product_matches#show",   as: :user_product_matches
+    post "/users/:user_id/product_matches" => "product_matches#create"
+  end
+
   scope "/s/:share_token", as: :shared do
     get "" => "shared_lists#show", as: :list
     resources :list_items, path: "items", only: [:create, :update, :destroy], module: "shared"

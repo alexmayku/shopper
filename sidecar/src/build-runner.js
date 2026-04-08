@@ -6,7 +6,7 @@ import { goToCheckout } from "./tesco/checkout.js";
 import { postToRails } from "./rails-callback.js";
 
 // matchItem(searchResults, item) → { tesco_product_id, confidence } | null
-// Stub for now: pick the first search result. Real LLM matching lands in Prompt 14.
+// Default fallback when no LLM-backed matcher is supplied: pick the first search result.
 function defaultMatcher(searchResults /* , item */) {
   if (!searchResults?.length) return null;
   return { tesco_product_id: searchResults[0].tesco_product_id, confidence: 1.0 };
