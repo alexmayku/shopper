@@ -17,7 +17,10 @@ Rails.application.routes.draw do
   end
 
   resources :basket_builds, only: [:create, :show], path: "builds" do
-    member { post :existing_basket_decision }
+    member do
+      post :existing_basket_decision
+      post :resume
+    end
   end
 
   namespace :internal do

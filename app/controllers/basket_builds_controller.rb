@@ -22,6 +22,17 @@ class BasketBuildsController < ApplicationController
     redirect_to @basket_build, status: :see_other
   end
 
+  def resume
+    @basket_build = current_user.basket_builds.find(params[:id])
+    unless @basket_build.paused_verification?
+      return redirect_to @basket_build, alert: "Build isn't paused.", status: :see_other
+    end
+    SidecarClient.send_existing_basket_decision(@basket_build, "resume")
+    @basket_build.update!(status: :building)
+    @basket_build.append_progress({ "event" => "resumed", "at" => Time.current.to_s })
+    redirect_to @basket_build, status: :see_other
+  end
+
   def existing_basket_decision
     @basket_build = current_user.basket_builds.find(params[:id])
     action = params[:decision].to_s

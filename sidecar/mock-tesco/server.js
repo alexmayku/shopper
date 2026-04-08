@@ -61,6 +61,14 @@ export function buildMockTesco() {
     return sessions.get(sid);
   }
 
+  // When true, the next POST /login returns a verification interstitial.
+  // Cleared automatically after firing.
+  let verificationOncePending = false;
+  fastify.post("/__test/verification_once", async (_req, reply) => {
+    verificationOncePending = true;
+    return reply.send({ ok: true });
+  });
+
   fastify.post("/__test/preseed", async (request, reply) => {
     const { items = [] } = request.body ?? {};
     globalPreseed.length = 0;
@@ -71,6 +79,7 @@ export function buildMockTesco() {
   fastify.post("/__test/reset", async (_req, reply) => {
     globalPreseed.length = 0;
     sessions.clear();
+    verificationOncePending = false;
     return reply.send({ ok: true });
   });
 
@@ -96,6 +105,12 @@ export function buildMockTesco() {
 
   fastify.post("/login", async (request, reply) => {
     const session = ensureSession(request, reply);
+    if (verificationOncePending) {
+      verificationOncePending = false;
+      return reply
+        .type("text/html")
+        .send('<!doctype html><html><body><h1>Mock Tesco</h1><div data-verify-required>Please verify.</div></body></html>');
+    }
     if (request.query?.challenge === "1") {
       reply
         .type("text/html")

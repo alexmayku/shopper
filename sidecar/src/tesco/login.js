@@ -1,5 +1,5 @@
-export async function login(page, { baseUrl, email, password }) {
-  await page.goto(`${baseUrl}/login`, { timeout: 10_000 });
+export async function login(page, { baseUrl, email, password, loginPath = "/login" }) {
+  await page.goto(`${baseUrl}${loginPath}`, { timeout: 10_000 });
   await page.fill("#email", email);
   await page.fill("#password", password);
   await Promise.all([

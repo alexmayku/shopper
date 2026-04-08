@@ -65,12 +65,29 @@ export async function runBuild({
     if (!loginResult.ok) {
       if (loginResult.reason === "verification_required") {
         await post("verification_required", { build_id: buildId });
-        await post("failed", { build_id: buildId, error_message: "verification_required" });
-        return { status: "failed", reason: "verification_required" };
+        let decision;
+        try {
+          decision = await awaitDecision(buildId, { timeoutMs: existingBasketDecisionTimeoutMs });
+        } catch (_e) {
+          await post("failed", { build_id: buildId, error_message: "verification_timeout" });
+          return { status: "failed", reason: "verification_timeout" };
+        }
+        if (decision === "cancel") {
+          await post("failed", { build_id: buildId, error_message: "cancelled_by_user" });
+          return { status: "cancelled" };
+        }
+        const retry = await login(page, { baseUrl, email: tescoEmail, password: tescoPassword });
+        if (!retry.ok) {
+          await post("failed", { build_id: buildId, error_message: `login_failed_after_resume: ${retry.reason}` });
+          return { status: "failed", reason: retry.reason };
+        }
+        await post("progress", { build_id: buildId, event: "logged_in_after_verification" });
+      } else {
+        throw new Error(`login_failed: ${loginResult.reason}`);
       }
-      throw new Error(`login_failed: ${loginResult.reason}`);
+    } else {
+      await post("progress", { build_id: buildId, event: "logged_in" });
     }
-    await post("progress", { build_id: buildId, event: "logged_in" });
 
     // Pre-build basket check: pause for a user decision if items already present.
     const { itemCount } = await checkExistingBasket(page, { baseUrl });
