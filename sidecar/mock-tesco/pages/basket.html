@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Basket · Mock Tesco</title></head>
+<body>
+  <header><h1>Mock Tesco</h1></header>
+  <main>
+    <h2>Your basket</h2>
+    <ul data-basket-items>
+      {{ITEMS}}
+    </ul>
+    <p>Total: £<span data-basket-total>{{TOTAL}}</span></p>
+    <form method="post" action="/checkout">
+      <button type="submit" id="go-to-checkout">Go to checkout</button>
+    </form>
+  </main>
+</body>
+</html>

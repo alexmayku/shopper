@@ -1,0 +1,36 @@
+[
+  { "id": "p001", "name": "Tesco British Whole Milk 2.272L", "price": 1.85, "category": "dairy", "organic": false, "tier": "budget" },
+  { "id": "p002", "name": "Tesco Organic Whole Milk 1L", "price": 1.55, "category": "dairy", "organic": true, "tier": "premium" },
+  { "id": "p003", "name": "Tesco Semi Skimmed Milk 2.272L", "price": 1.85, "category": "dairy", "organic": false, "tier": "mid" },
+  { "id": "p004", "name": "Tesco British Salted Butter 250g", "price": 2.30, "category": "dairy", "organic": false, "tier": "mid" },
+  { "id": "p005", "name": "Tesco Mature Cheddar 350g", "price": 3.20, "category": "dairy", "organic": false, "tier": "mid" },
+  { "id": "p006", "name": "Tesco Free Range Eggs 12 Pack", "price": 2.95, "category": "dairy", "organic": false, "tier": "mid" },
+  { "id": "p007", "name": "Tesco Organic Free Range Eggs 6 Pack", "price": 2.40, "category": "dairy", "organic": true, "tier": "premium" },
+  { "id": "p008", "name": "Tesco Greek Style Yogurt 500g", "price": 1.50, "category": "dairy", "organic": false, "tier": "mid" },
+
+  { "id": "p101", "name": "Tesco White Bread 800g", "price": 0.85, "category": "bakery", "organic": false, "tier": "budget" },
+  { "id": "p102", "name": "Tesco Wholemeal Loaf 800g", "price": 1.10, "category": "bakery", "organic": false, "tier": "mid" },
+  { "id": "p103", "name": "Tesco Finest Sourdough 500g", "price": 2.25, "category": "bakery", "organic": false, "tier": "premium" },
+  { "id": "p104", "name": "Tesco Croissants 6 Pack", "price": 1.50, "category": "bakery", "organic": false, "tier": "mid" },
+  { "id": "p105", "name": "Tesco Bagels Plain 5 Pack", "price": 1.20, "category": "bakery", "organic": false, "tier": "mid" },
+
+  { "id": "p201", "name": "Tesco Bananas Loose", "price": 0.13, "category": "produce", "organic": false, "tier": "budget" },
+  { "id": "p202", "name": "Tesco Organic Bananas 5 Pack", "price": 1.30, "category": "produce", "organic": true, "tier": "premium" },
+  { "id": "p203", "name": "Tesco Apples Gala 6 Pack", "price": 1.85, "category": "produce", "organic": false, "tier": "mid" },
+  { "id": "p204", "name": "Tesco Organic Carrots 1kg", "price": 1.20, "category": "produce", "organic": true, "tier": "premium" },
+  { "id": "p205", "name": "Tesco Tomatoes On The Vine 400g", "price": 1.40, "category": "produce", "organic": false, "tier": "mid" },
+  { "id": "p206", "name": "Tesco Avocado Single", "price": 0.95, "category": "produce", "organic": false, "tier": "mid" },
+  { "id": "p207", "name": "Tesco Spinach 200g", "price": 1.10, "category": "produce", "organic": false, "tier": "mid" },
+  { "id": "p208", "name": "Tesco Onions Brown 1kg", "price": 0.85, "category": "produce", "organic": false, "tier": "budget" },
+
+  { "id": "p301", "name": "Tesco Penne Pasta 500g", "price": 0.75, "category": "pantry", "organic": false, "tier": "budget" },
+  { "id": "p302", "name": "Tesco Spaghetti 500g", "price": 0.75, "category": "pantry", "organic": false, "tier": "budget" },
+  { "id": "p303", "name": "Tesco Finest Penne 500g", "price": 1.65, "category": "pantry", "organic": false, "tier": "premium" },
+  { "id": "p304", "name": "Tesco Long Grain Rice 1kg", "price": 1.25, "category": "pantry", "organic": false, "tier": "budget" },
+  { "id": "p305", "name": "Tesco Olive Oil 500ml", "price": 4.50, "category": "pantry", "organic": false, "tier": "mid" },
+  { "id": "p306", "name": "Tesco Extra Virgin Olive Oil 750ml", "price": 6.95, "category": "pantry", "organic": false, "tier": "premium" },
+  { "id": "p307", "name": "Tesco Chopped Tomatoes 400g", "price": 0.55, "category": "pantry", "organic": false, "tier": "budget" },
+  { "id": "p308", "name": "Tesco Baked Beans 415g", "price": 0.85, "category": "pantry", "organic": false, "tier": "budget" },
+  { "id": "p309", "name": "Tesco Cornflakes 500g", "price": 1.75, "category": "pantry", "organic": false, "tier": "mid" },
+  { "id": "p310", "name": "Tesco Tea Bags 80", "price": 2.40, "category": "pantry", "organic": false, "tier": "mid" }
+]

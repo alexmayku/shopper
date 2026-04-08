@@ -1,0 +1,16 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Sign in · Mock Tesco</title></head>
+<body>
+  <header><h1>Mock Tesco</h1></header>
+  <main>
+    <h2>Sign in</h2>
+    {{CHALLENGE_BANNER}}
+    <form method="post" action="/login{{CHALLENGE_QS}}">
+      <label>Email <input type="email" name="email" id="email" required></label>
+      <label>Password <input type="password" name="password" id="password" required></label>
+      <button type="submit" id="signin">Sign in</button>
+    </form>
+  </main>
+</body>
+</html>
