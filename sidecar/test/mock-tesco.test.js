@@ -53,26 +53,26 @@ describe("mock tesco", () => {
   });
 
   it("search returns matching products", async () => {
-    const res = await server.inject({ method: "GET", url: "/search?q=milk" });
+    const res = await server.inject({ method: "GET", url: "/groceries/en-GB/search?query=milk" });
     expect(res.statusCode).toBe(200);
     expect(res.body).toContain("Whole Milk");
-    expect(res.body).toContain("data-product-id=");
+    expect(res.body).toContain("data-testid=");
   });
 
   it("search with no matches returns an empty list", async () => {
-    const res = await server.inject({ method: "GET", url: "/search?q=zzznotreal" });
+    const res = await server.inject({ method: "GET", url: "/groceries/en-GB/search?query=zzznotreal" });
     expect(res.statusCode).toBe(200);
-    expect(res.body).not.toContain("data-product-id=");
+    expect(res.body).not.toContain("data-testid=");
   });
 
-  it("can add a product to the basket and see it on /basket with a total", async () => {
+  it("can add a product to the basket and see it on /groceries/ with a total", async () => {
     const initial = await server.inject({ method: "GET", url: "/" });
     const cookie = getCookie(initial);
     expect(cookie).toBeTruthy();
 
     const add = await server.inject({
       method: "POST",
-      url: "/basket/add",
+      url: "/groceries/en-GB/trolley/add",
       headers: {
         "content-type": "application/x-www-form-urlencoded",
         cookie,
@@ -80,11 +80,11 @@ describe("mock tesco", () => {
       payload: "product_id=p001&quantity=2",
     });
     expect(add.statusCode).toBe(302);
-    expect(add.headers.location).toBe("/basket");
+    expect(add.headers.location).toBe("/groceries/");
 
     const basket = await server.inject({
       method: "GET",
-      url: "/basket",
+      url: "/groceries/",
       headers: { cookie },
     });
     expect(basket.statusCode).toBe(200);
@@ -99,18 +99,18 @@ describe("mock tesco", () => {
 
     await server.inject({
       method: "POST",
-      url: "/basket/add",
+      url: "/groceries/en-GB/trolley/add",
       headers: { "content-type": "application/x-www-form-urlencoded", cookie },
       payload: "product_id=p101&quantity=1",
     });
 
     const checkout = await server.inject({
       method: "POST",
-      url: "/checkout",
+      url: "/groceries/en-GB/checkout",
       headers: { cookie },
     });
     expect(checkout.statusCode).toBe(302);
-    expect(checkout.headers.location).toMatch(/^\/checkout\/[a-f0-9]+$/);
+    expect(checkout.headers.location).toMatch(/^\/groceries\/en-GB\/checkout\/[a-f0-9]+$/);
 
     const page = await server.inject({
       method: "GET",

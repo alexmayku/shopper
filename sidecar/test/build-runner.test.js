@@ -3,6 +3,7 @@ import Fastify from "fastify";
 import { buildMockTesco } from "../mock-tesco/server.js";
 import { runBuild } from "../src/build-runner.js";
 import { verify } from "../src/auth.js";
+import { startChromeWithCdp } from "./helpers/chrome-cdp.js";
 
 const SECRET = "test-secret";
 let mockTesco;
@@ -98,6 +99,48 @@ describe("build-runner", () => {
     // is exercised by mock-tesco.test.js separately.
     expect(["completed", "failed"]).toContain(result.status);
   }, 60_000);
+
+  describe("with cdpUrl (attach mode)", () => {
+    let chrome;
+
+    beforeAll(async () => {
+      chrome = await startChromeWithCdp();
+    }, 30_000);
+
+    afterAll(async () => {
+      await chrome?.cleanup();
+    });
+
+    it("attaches to a running Chrome, skips login, completes build, and leaves Chrome alive", async () => {
+      received.length = 0;
+
+      const result = await runBuild({
+        buildId: 42,
+        // tescoEmail/tescoPassword should be irrelevant in attach mode
+        tescoEmail: "ignored@example.com",
+        tescoPassword: "ignored",
+        items: [{ freeform: "milk", quantity: 1 }],
+        baseUrl: mockTescoUrl,
+        railsCallbackBase: mockRailsUrl,
+        hmacSecret: SECRET,
+        cdpUrl: chrome.cdpUrl,
+      });
+
+      expect(result.status).toBe("completed");
+
+      const events = received.map((r) => ({ event: r.event, body: r.body }));
+      // Login was skipped — no "logged_in" event should appear.
+      expect(events.some((e) => e.body.event === "logged_in")).toBe(false);
+      // Instead, we expect an "attached" progress event.
+      expect(events.some((e) => e.body.event === "attached")).toBe(true);
+      // Build still reaches completion.
+      expect(events.at(-1).event).toBe("completed");
+
+      // Chrome should still be alive after the build (cleanup must not kill it).
+      const res = await fetch(`${chrome.cdpUrl}/json/version`);
+      expect(res.ok).toBe(true);
+    }, 60_000);
+  });
 
   it("records unmatched items and still completes", async () => {
     received.length = 0;

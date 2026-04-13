@@ -31,7 +31,7 @@ class PolishTest < ApplicationSystemTestCase
 
   test "build failed partial uses the calm copy" do
     user = User.create!(email: "fail@example.com", password: "password123",
-                        tesco_email: "x@tesco.com", tesco_password: "x")
+                        tesco_session_state: '{"cookies":[]}', tesco_session_saved_at: Time.current)
     build = user.basket_builds.create!(list_snapshot: [], status: :failed,
                                        error_message: "tesco unreachable")
 

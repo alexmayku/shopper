@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_07_090420) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_13_073449) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -107,8 +107,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_07_090420) do
     t.integer "price_range", default: 1, null: false
     t.string "stripe_customer_id"
     t.integer "subscription_status", default: 0, null: false
-    t.string "tesco_email"
-    t.string "tesco_password"
+    t.datetime "tesco_session_saved_at"
+    t.text "tesco_session_state"
     t.boolean "trial_used", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email", unique: true

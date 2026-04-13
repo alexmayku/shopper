@@ -1,5 +1,8 @@
 import { verify } from "../auth.js";
 import { runBuild, resolveExistingBasketDecision } from "../build-runner.js";
+import { makeCachedMatcher } from "../matching/match.js";
+import { callClaude } from "../matching/anthropic-client.js";
+import { makeCacheClient } from "../matching/cache-client.js";
 
 export default async function buildRoutes(fastify, opts) {
   const secret = opts.secret;
@@ -24,14 +27,40 @@ export default async function buildRoutes(fastify, opts) {
           password: process.env.PROXY_PROVIDER_PASS,
         }
       : undefined;
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    let matcher;
+    if (!apiKey) {
+      console.warn("[build] ANTHROPIC_API_KEY not set — using defaultMatcher (first search result)");
+    }
+    if (apiKey) {
+      const cache = makeCacheClient({ railsCallbackBase: payload.railsCallbackBase, hmacSecret: secret });
+      const anthropic = (opts) => callClaude({ apiKey, ...opts });
+      matcher = makeCachedMatcher({
+        userId: payload.userId,
+        prefs: payload.preferences,
+        cache,
+        anthropic,
+      });
+    }
+    // If the client sent a saved Tesco session, parse and pass it through.
+    let storageState;
+    if (payload.tescoSessionState) {
+      try {
+        storageState = typeof payload.tescoSessionState === "string"
+          ? JSON.parse(payload.tescoSessionState)
+          : payload.tescoSessionState;
+      } catch { /* invalid JSON — fall back to login */ }
+    }
+
     runBuild({
       buildId: payload.buildId,
-      tescoEmail: payload.tescoEmail,
-      tescoPassword: payload.tescoPassword,
       items: payload.items ?? [],
       railsCallbackBase: payload.railsCallbackBase,
       hmacSecret: secret,
       proxy,
+      preferences: payload.preferences,
+      storageState,
+      ...(matcher && { matcher }),
     }).catch((err) => fastify.log?.error?.(err));
     return reply.code(202).send({ accepted: true, buildId: payload.buildId });
   });

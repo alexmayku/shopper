@@ -41,7 +41,7 @@ class ExistingBasketTest < ApplicationSystemTestCase
     fill_in "user_password_confirmation", with: "password123"
     click_on "Sign up"
     assert_current_path list_path
-    User.find_by!(email: "ebasket@example.com").update!(tesco_email: "shop@tesco.com", tesco_password: "secret")
+    User.find_by!(email: "ebasket@example.com").update!(tesco_session_state: '{"cookies":[]}', tesco_session_saved_at: Time.current)
 
     fill_in "list_item_freeform_text", with: "milk"
     click_on "Add"

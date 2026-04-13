@@ -1,0 +1,45 @@
+#!/usr/bin/env sh
+# Launches a real Google Chrome with a CDP remote-debugging port that the
+# sidecar can attach to. Use this for end-to-end testing against the real
+# tesco.com without tripping Akamai's bot defenses: log into Tesco manually
+# in the window this opens, then trigger a build from the Rails app.
+#
+#   bin/chrome-tesco
+#
+# Override defaults via env vars:
+#   PORT=9333 USER_DATA_DIR=/tmp/my-tesco-profile bin/chrome-tesco
+
+set -e
+
+PORT="${PORT:-9222}"
+USER_DATA_DIR="${USER_DATA_DIR:-/tmp/kart-chrome-profile}"
+
+CHROME=""
+if [ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
+  CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+elif command -v google-chrome >/dev/null 2>&1; then
+  CHROME="google-chrome"
+elif command -v chromium >/dev/null 2>&1; then
+  CHROME="chromium"
+else
+  echo "Could not find Google Chrome. Install it or edit bin/chrome-tesco." >&2
+  exit 1
+fi
+
+mkdir -p "$USER_DATA_DIR"
+
+echo "Launching Chrome with CDP on http://localhost:$PORT"
+echo "Profile: $USER_DATA_DIR"
+echo
+echo "Next steps:"
+echo "  1. In the window that opens, go to https://www.tesco.com and log in."
+echo "  2. Make sure CHROME_CDP_URL=http://localhost:$PORT is set in Procfile.dev"
+echo "     (or in the sidecar's environment) so bin/dev can attach."
+echo "  3. Trigger a basket build from the Rails app."
+echo
+
+exec "$CHROME" \
+  --remote-debugging-port="$PORT" \
+  --user-data-dir="$USER_DATA_DIR" \
+  --no-first-run \
+  --no-default-browser-check

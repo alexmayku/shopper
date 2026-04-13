@@ -61,6 +61,9 @@ export function buildMockTesco() {
     return sessions.get(sid);
   }
 
+  // Product IDs that should be rendered as out-of-stock (no add button).
+  const outOfStockProducts = new Set();
+
   // When true, the next POST /login returns a verification interstitial.
   // Cleared automatically after firing.
   let verificationOncePending = false;
@@ -76,8 +79,15 @@ export function buildMockTesco() {
     return reply.send({ ok: true, preseed: globalPreseed });
   });
 
+  fastify.post("/__test/out_of_stock", async (request, reply) => {
+    const { product_ids = [] } = request.body ?? {};
+    for (const id of product_ids) outOfStockProducts.add(id);
+    return reply.send({ ok: true, out_of_stock: [...outOfStockProducts] });
+  });
+
   fastify.post("/__test/reset", async (_req, reply) => {
     globalPreseed.length = 0;
+    outOfStockProducts.clear();
     sessions.clear();
     verificationOncePending = false;
     return reply.send({ ok: true });
@@ -123,24 +133,25 @@ export function buildMockTesco() {
     reply.redirect("/");
   });
 
-  fastify.get("/search", async (request, reply) => {
+  fastify.get("/groceries/en-GB/search", async (request, reply) => {
     ensureSession(request, reply);
-    const q = (request.query?.q ?? "").toString();
+    const q = (request.query?.query ?? "").toString();
     const results = searchProducts(q)
       .map(
         (p) =>
-          `<li data-product data-product-id="${p.id}"><a href="/product/${p.id}">${p.name}</a> <span data-price>£${p.price.toFixed(2)}</span></li>`
+          `<li data-testid="${p.id}"><a class="titleLink" href="/groceries/en-GB/products/${p.id}">${p.name}</a> <p class="priceText">£${p.price.toFixed(2)}</p></li>`
       )
       .join("\n");
     reply.type("text/html").send(tpl("search.html", { QUERY: q, RESULTS: results }));
   });
 
-  fastify.get("/product/:id", async (request, reply) => {
+  fastify.get("/groceries/en-GB/products/:id", async (request, reply) => {
     ensureSession(request, reply);
     const p = findProduct(request.params.id);
     if (!p) return reply.code(404).send("Not found");
+    const template = outOfStockProducts.has(p.id) ? "product-oos.html" : "product.html";
     reply.type("text/html").send(
-      tpl("product.html", {
+      tpl(template, {
         ID: p.id,
         NAME: p.name,
         PRICE: p.price.toFixed(2),
@@ -149,7 +160,7 @@ export function buildMockTesco() {
     );
   });
 
-  fastify.post("/basket/add", async (request, reply) => {
+  fastify.post("/groceries/en-GB/trolley/add", async (request, reply) => {
     const session = ensureSession(request, reply);
     const { product_id, quantity } = request.body ?? {};
     if (!findProduct(product_id)) return reply.code(404).send("Unknown product");
@@ -157,7 +168,7 @@ export function buildMockTesco() {
     const existing = session.basket.items.find((i) => i.product_id === product_id);
     if (existing) existing.quantity += qty;
     else session.basket.items.push({ product_id, quantity: qty });
-    reply.redirect("/basket");
+    reply.redirect("/groceries/");
   });
 
   // Test helper: pre-populate the basket with one item before login.
@@ -169,13 +180,13 @@ export function buildMockTesco() {
     return reply.send({ ok: true });
   });
 
-  fastify.get("/basket/clear", async (request, reply) => {
+  fastify.get("/groceries/en-GB/trolley/clear", async (request, reply) => {
     const session = ensureSession(request, reply);
     session.basket.items = [];
-    reply.redirect("/basket");
+    reply.redirect("/groceries/");
   });
 
-  fastify.get("/basket", async (request, reply) => {
+  fastify.get("/groceries/", async (request, reply) => {
     const session = ensureSession(request, reply);
     const items = session.basket.items
       .map((line) => {
@@ -188,12 +199,12 @@ export function buildMockTesco() {
     );
   });
 
-  fastify.post("/checkout", async (request, reply) => {
+  fastify.post("/groceries/en-GB/checkout", async (request, reply) => {
     const session = ensureSession(request, reply);
-    reply.redirect(`/checkout/${session.basket.id}`);
+    reply.redirect(`/groceries/en-GB/checkout/${session.basket.id}`);
   });
 
-  fastify.get("/checkout/:basket_id", async (request, reply) => {
+  fastify.get("/groceries/en-GB/checkout/:basket_id", async (request, reply) => {
     const session = ensureSession(request, reply);
     reply.type("text/html").send(
       tpl("checkout.html", {

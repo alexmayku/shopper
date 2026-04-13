@@ -19,21 +19,11 @@ class PreferencesControllerTest < ActionDispatch::IntegrationTest
     assert @user.organic_preference
   end
 
-  test "update sets tesco credentials, encrypted at rest" do
-    patch preferences_path, params: { user: { tesco_email: "shop@tesco.com", tesco_password: "s3cret" } }
+  test "update saves price_range and organic_preference" do
+    patch preferences_path, params: { user: { price_range: "budget", organic_preference: "0" } }
     @user.reload
-    assert_equal "shop@tesco.com", @user.tesco_email
-    assert_equal "s3cret", @user.tesco_password
-    raw = User.connection.select_value("SELECT tesco_password FROM users WHERE id = #{@user.id}")
-    assert_not_equal "s3cret", raw
-  end
-
-  test "clear_tesco_credentials nils both fields" do
-    @user.update!(tesco_email: "x@tesco.com", tesco_password: "pw")
-    delete clear_tesco_credentials_path
-    @user.reload
-    assert_nil @user.tesco_email
-    assert_nil @user.tesco_password
+    assert_equal "budget", @user.price_range
+    assert_not @user.organic_preference
   end
 
   test "requires login" do

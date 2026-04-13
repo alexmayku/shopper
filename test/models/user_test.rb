@@ -38,14 +38,14 @@ class UserTest < ActiveSupport::TestCase
     assert_not u.authenticate("wrong")
   end
 
-  test "encrypts tesco credentials round-trip" do
+  test "encrypts tesco session state round-trip" do
+    state = '{"cookies":[{"name":"sid","value":"abc"}]}'
     u = User.create!(email: "t@example.com", password: "password123",
-                     tesco_email: "shopper@tesco.com", tesco_password: "secret!")
+                     tesco_session_state: state)
     u.reload
-    assert_equal "shopper@tesco.com", u.tesco_email
-    assert_equal "secret!", u.tesco_password
-    raw = User.connection.select_value("SELECT tesco_password FROM users WHERE id = #{u.id}")
-    assert_not_equal "secret!", raw
+    assert_equal state, u.tesco_session_state
+    raw = User.connection.select_value("SELECT tesco_session_state FROM users WHERE id = #{u.id}")
+    assert_not_equal state, raw
   end
 
   test "subscription_status enum default none" do

@@ -6,7 +6,7 @@
     <p class="mt-1 text-sm text-neutral-500">Signed in as <%= @user.email %></p>
   </div>
 
-  <%= form_with model: @user, url: preferences_path, method: :patch, scope: :user, class: "space-y-8" do |form| %>
+  <%= form_with model: @user, url: preferences_path, method: :patch, scope: :user, class: "space-y-8", data: { turbo: false } do |form| %>
     <section class="<%= card_classes %>">
       <h2 class="text-lg font-semibold mb-1">Supermarket</h2>
       <div class="text-base font-medium">Tesco</div>
@@ -40,10 +40,20 @@
       </label>
     </section>
 
-    <%= render "tesco_credentials", form: form, user: @user %>
+    <%= render "tesco_credentials", user: @user %>
 
     <div>
       <%= form.submit "Save preferences", class: button_classes(:primary, extra: "w-full") %>
+    </div>
+  <% end %>
+
+  <% if @user.tesco_session_state.present? %>
+    <div class="mt-4 space-y-2">
+      <%= button_to "Reconnect Tesco", tesco_session_path, method: :post,
+            class: button_classes(:secondary, extra: "w-full") %>
+      <%= button_to "Disconnect Tesco", tesco_session_path, method: :delete,
+            class: button_classes(:tertiary, extra: "w-full"),
+            form: { data: { turbo_confirm: "Disconnect your Tesco session?" } } %>
     </div>
   <% end %>
 </div>

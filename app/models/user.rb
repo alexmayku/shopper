@@ -2,8 +2,7 @@ class User < ApplicationRecord
   has_secure_password
   has_many :sessions, dependent: :destroy
 
-  encrypts :tesco_email
-  encrypts :tesco_password
+  encrypts :tesco_session_state
 
   enum :subscription_status, {
     none: 0,

@@ -7,7 +7,11 @@ Rails.application.routes.draw do
   get "/signup" => "registrations#new"
 
   resource :preferences, only: [:edit, :update]
-  delete "/preferences/tesco" => "preferences#clear_tesco_credentials", as: :clear_tesco_credentials
+
+  resource :tesco_session, only: [:create, :destroy] do
+    post :complete, on: :member
+    get  :poll,     on: :member
+  end
 
   get  "/list" => "lists#show", as: :list
   post "/list/clear" => "lists#clear", as: :clear_list
@@ -42,6 +46,7 @@ Rails.application.routes.draw do
     post "/builds/:id/verification_required" => "basket_build_callbacks#verification_required", as: :build_verification_required
     post "/builds/:id/completed"             => "basket_build_callbacks#completed",             as: :build_completed
     post "/builds/:id/failed"                => "basket_build_callbacks#failed",                as: :build_failed
+    post "/builds/:id/session_expired"       => "basket_build_callbacks#session_expired",       as: :build_session_expired
   end
 
   scope "/s/:share_token", as: :shared do
@@ -59,5 +64,5 @@ Rails.application.routes.draw do
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "lists#show"
 end

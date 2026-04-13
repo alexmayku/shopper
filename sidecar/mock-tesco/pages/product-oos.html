@@ -8,11 +8,7 @@
       <h2 data-product-name>{{NAME}}</h2>
       <p data-product-price>£{{PRICE}}</p>
       <p data-product-category>{{CATEGORY}}</p>
-      <form method="post" action="/groceries/en-GB/trolley/add">
-        <input type="hidden" name="product_id" value="{{ID}}">
-        <input type="number" name="quantity" value="1" min="1" data-auto="ddsweb-quantity-controls-input">
-        <button type="submit" data-auto="ddsweb-quantity-controls-add-button">Add</button>
-      </form>
+      <p>This product's currently out of stock</p>
     </article>
   </main>
 </body>

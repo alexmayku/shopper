@@ -7,7 +7,7 @@ class BasketBuildsController < ApplicationController
   end
 
   def create
-    if current_user.tesco_email.blank? || current_user.tesco_password.blank?
+    unless current_user.tesco_session_state.present?
       return redirect_to edit_preferences_path,
                          alert: "Let's get you signed into Tesco first.",
                          status: :see_other

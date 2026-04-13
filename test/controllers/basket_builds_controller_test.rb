@@ -3,7 +3,7 @@ require "test_helper"
 class BasketBuildsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = users(:alice)
-    @user.update!(tesco_email: "shop@tesco.com", tesco_password: "secret")
+    @user.update!(tesco_session_state: '{"cookies":[]}', tesco_session_saved_at: Time.current)
     sign_in_as(@user)
     @captured_sidecar_calls = []
     captured = @captured_sidecar_calls

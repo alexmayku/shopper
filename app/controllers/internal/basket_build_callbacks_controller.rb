@@ -48,6 +48,13 @@ class Internal::BasketBuildCallbacksController < ApplicationController
     head :ok
   end
 
+  def session_expired
+    @build.update!(status: :failed, error_message: "Tesco session expired")
+    @build.user.update!(tesco_session_state: nil, tesco_session_saved_at: nil)
+    rebroadcast_status
+    head :ok
+  end
+
   private
 
   def load_build

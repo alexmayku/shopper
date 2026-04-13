@@ -1,5 +1,10 @@
 web: bin/rails server
 worker: bin/jobs
 css: bin/rails tailwindcss:watch
-sidecar: cd sidecar && npm run dev
-mock_tesco: cd sidecar && npm run mock-tesco
+# CHROME_CDP_URL points the sidecar at a real Chrome the user has logged into
+# manually (defeats Tesco's Akamai bot defenses). Run `bin/chrome-tesco` in
+# another terminal BEFORE starting bin/dev — otherwise builds will fail when
+# the sidecar tries to attach. Remove CHROME_CDP_URL to fall back to launching
+# a fresh stealth Chromium (which Akamai will block on real tesco.com).
+sidecar: cd sidecar && PORT=4001 TESCO_BASE_URL=https://www.tesco.com TESCO_LOGIN_PATH=/account/login CHROME_CDP_URL=http://localhost:9222 npm run dev
+mock_tesco: cd sidecar && PORT=4002 npm run mock-tesco

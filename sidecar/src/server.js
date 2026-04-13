@@ -1,7 +1,10 @@
+import "dotenv/config";
 import Fastify from "fastify";
 import healthRoutes from "./routes/health.js";
 import buildRoutes from "./routes/build.js";
 import searchRoutes from "./routes/search.js";
+import tescoLoginRoutes from "./routes/tesco-login.js";
+import captureCookiesRoutes from "./routes/capture-cookies.js";
 
 export function buildServer({ secret = process.env.SIDECAR_HMAC_SECRET ?? "dev-secret" } = {}) {
   const fastify = Fastify({ logger: false });
@@ -18,6 +21,8 @@ export function buildServer({ secret = process.env.SIDECAR_HMAC_SECRET ?? "dev-s
   fastify.register(healthRoutes);
   fastify.register(buildRoutes, { secret });
   fastify.register(searchRoutes, { secret });
+  fastify.register(tescoLoginRoutes, { secret });
+  fastify.register(captureCookiesRoutes, { secret });
 
   return fastify;
 }
