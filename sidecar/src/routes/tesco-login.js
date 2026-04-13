@@ -28,8 +28,10 @@ export default async function tescoLoginRoutes(fastify, opts) {
     const baseUrl = process.env.TESCO_BASE_URL ?? "https://www.tesco.com";
     const loginPath = process.env.TESCO_LOGIN_PATH ?? "/account/login";
 
-    // Launch a visible browser for manual login.
-    const handle = await launchBrowser({ headless: false });
+    // Launch browser for login. Use "new" headless mode which supports CDP
+    // screencast — frames are captured at the render engine level without
+    // needing a display. Falls back to visible if DISPLAY is available.
+    const handle = await launchBrowser({ headless: true });
     const page = await handle.context.newPage();
 
     // Navigate to the Tesco login page so the user can sign in.
@@ -44,6 +46,102 @@ export default async function tescoLoginRoutes(fastify, opts) {
     });
 
     return reply.code(202).send({ loginId });
+  });
+
+  // WebSocket endpoint: streams CDP screencast frames and accepts input events.
+  // Authenticated via a signed token in the query string.
+  fastify.get("/tesco-login/:id/ws", { websocket: true }, (socket, request) => {
+    const loginId = request.params.id;
+    const token = request.query?.token;
+
+    // Verify token (token = HMAC of loginId).
+    if (!token || !verify(loginId, token, secret)) {
+      socket.close(4001, "unauthorized");
+      return;
+    }
+
+    const session = sessions.get(loginId);
+    if (!session) {
+      socket.close(4004, "session_not_found");
+      return;
+    }
+
+    let cdpSession = null;
+
+    (async () => {
+      try {
+        // Get a CDP session for the page to control screencast and input.
+        // Playwright-extra wraps chromium, so we access CDP via the page's
+        // createCDPSession method (Playwright's public API).
+        cdpSession = await session.page.context().newCDPSession(session.page);
+
+        // Start screencast — sends JPEG frames at up to ~15fps.
+        cdpSession.on("Page.screencastFrame", (params) => {
+          // Acknowledge the frame so CDP sends the next one.
+          cdpSession.send("Page.screencastFrameAck", { sessionId: params.sessionId }).catch(() => {});
+          // Send the base64-decoded JPEG as binary.
+          const buf = Buffer.from(params.data, "base64");
+          if (socket.readyState === 1) socket.send(buf);
+        });
+
+        await cdpSession.send("Page.startScreencast", {
+          format: "jpeg",
+          quality: 70,
+          maxWidth: 1280,
+          maxHeight: 800,
+        });
+      } catch (e) {
+        // If CDP screencast fails, fall back to periodic screenshots.
+        console.log(`[tesco-login] CDP screencast failed (${e.message}), using screenshot fallback`);
+        const interval = setInterval(async () => {
+          try {
+            if (socket.readyState !== 1) { clearInterval(interval); return; }
+            const buf = await session.page.screenshot({ type: "jpeg", quality: 70 });
+            socket.send(buf);
+          } catch {
+            clearInterval(interval);
+          }
+        }, 200);
+
+        socket.on("close", () => clearInterval(interval));
+      }
+    })();
+
+    // Handle input from the client.
+    socket.on("message", async (raw) => {
+      if (!cdpSession) return;
+      try {
+        const msg = JSON.parse(raw.toString());
+        if (msg.type === "click") {
+          await cdpSession.send("Input.dispatchMouseEvent", {
+            type: "mousePressed", x: msg.x, y: msg.y, button: "left", clickCount: 1,
+          });
+          await cdpSession.send("Input.dispatchMouseEvent", {
+            type: "mouseReleased", x: msg.x, y: msg.y, button: "left", clickCount: 1,
+          });
+        } else if (msg.type === "keydown") {
+          await cdpSession.send("Input.dispatchKeyEvent", {
+            type: "keyDown", key: msg.key, code: msg.code, text: msg.key.length === 1 ? msg.key : "",
+          });
+          await cdpSession.send("Input.dispatchKeyEvent", {
+            type: "keyUp", key: msg.key, code: msg.code,
+          });
+        } else if (msg.type === "scroll") {
+          await cdpSession.send("Input.dispatchMouseEvent", {
+            type: "mouseWheel", x: msg.x, y: msg.y, deltaX: msg.deltaX ?? 0, deltaY: msg.deltaY ?? 0,
+          });
+        }
+      } catch {
+        // Ignore input errors — browser may be navigating.
+      }
+    });
+
+    socket.on("close", () => {
+      if (cdpSession) {
+        cdpSession.send("Page.stopScreencast").catch(() => {});
+        cdpSession.detach().catch(() => {});
+      }
+    });
   });
 
   // Poll login session status.

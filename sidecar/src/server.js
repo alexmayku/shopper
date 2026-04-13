@@ -1,5 +1,6 @@
 import "dotenv/config";
 import Fastify from "fastify";
+import websocket from "@fastify/websocket";
 import healthRoutes from "./routes/health.js";
 import buildRoutes from "./routes/build.js";
 import searchRoutes from "./routes/search.js";
@@ -18,6 +19,7 @@ export function buildServer({ secret = process.env.SIDECAR_HMAC_SECRET ?? "dev-s
     return stream;
   });
 
+  fastify.register(websocket);
   fastify.register(healthRoutes);
   fastify.register(buildRoutes, { secret });
   fastify.register(searchRoutes, { secret });
