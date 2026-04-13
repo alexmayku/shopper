@@ -1,0 +1,43 @@
+<% content_for :wide do %>1<% end %>
+
+<div class="space-y-6">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight">Connect Tesco</h1>
+    <p class="mt-1 text-sm text-neutral-500">
+      Sign into your Tesco account below. Your password goes directly to Tesco — we never see it.
+    </p>
+  </div>
+
+  <div data-controller="remote-browser"
+       data-remote-browser-ws-url-value="<%= @ws_url %>"
+       data-remote-browser-login-id-value="<%= @login_id %>"
+       class="space-y-4">
+
+    <div class="relative rounded-2xl border border-neutral-200 overflow-hidden bg-neutral-100">
+      <canvas data-remote-browser-target="canvas"
+              class="w-full cursor-pointer focus:outline-none"
+              style="aspect-ratio: 16/10;">
+      </canvas>
+      <div data-remote-browser-target="status"
+           class="absolute top-3 right-3 px-3 py-1 rounded-full text-xs font-medium bg-neutral-900/70 text-white">
+        Connecting...
+      </div>
+    </div>
+
+    <div class="flex gap-3">
+      <%= button_to "Done — save session",
+            complete_tesco_session_path,
+            method: :post,
+            class: button_classes(:primary, extra: "flex-1") %>
+
+      <%= button_to "Cancel",
+            tesco_session_path,
+            method: :delete,
+            class: button_classes(:tertiary, extra: "flex-1") %>
+    </div>
+
+    <p class="text-xs text-neutral-400 text-center">
+      Click on the browser above to interact. After signing in, click "Done" to save your session.
+    </p>
+  </div>
+</div>

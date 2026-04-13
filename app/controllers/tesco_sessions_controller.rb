@@ -1,26 +1,24 @@
 class TescoSessionsController < ApplicationController
   before_action :require_authentication
 
-  # POST /tesco_session — initiate login via sidecar
+  # POST /tesco_session — initiate login via sidecar, redirect to remote browser
   def create
     result = SidecarClient.start_tesco_login
     session[:tesco_login_id] = result["loginId"]
-    redirect_to edit_preferences_path, notice: "Tesco login started — complete sign-in in the browser window."
+    redirect_to tesco_session_path, status: :see_other
   rescue SidecarClient::Error => e
     redirect_to edit_preferences_path, alert: "Could not start Tesco login: #{e.message}"
   end
 
-  # GET /tesco_session/poll — AJAX poll for login completion
-  def poll
-    login_id = session[:tesco_login_id]
-    unless login_id
-      return render json: { status: "no_session" }, status: :not_found
+  # GET /tesco_session — show remote browser for login
+  def show
+    @login_id = session[:tesco_login_id]
+    unless @login_id
+      return redirect_to edit_preferences_path, alert: "No active login session."
     end
-
-    result = SidecarClient.poll_tesco_login(login_id)
-    render json: result
-  rescue SidecarClient::Error => e
-    render json: { status: "error", error: e.message }, status: :unprocessable_entity
+    # Generate a signed token for the WebSocket connection.
+    @ws_token = OpenSSL::HMAC.hexdigest("SHA256", sidecar_secret, @login_id)
+    @ws_url = "#{sidecar_ws_url}/tesco-login/#{@login_id}/ws?token=#{@ws_token}"
   end
 
   # POST /tesco_session/complete — capture cookies and save
@@ -50,5 +48,16 @@ class TescoSessionsController < ApplicationController
 
     current_user.update!(tesco_session_state: nil, tesco_session_saved_at: nil)
     redirect_to edit_preferences_path, notice: "Tesco session cleared."
+  end
+
+  private
+
+  def sidecar_secret
+    ENV["SIDECAR_HMAC_SECRET"].presence || "dev-secret"
+  end
+
+  def sidecar_ws_url
+    base = ENV["SIDECAR_URL"].presence || "http://localhost:4001"
+    base.sub(/^http/, "ws")
   end
 end

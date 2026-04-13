@@ -8,7 +8,7 @@ Rails.application.routes.draw do
 
   resource :preferences, only: [:edit, :update]
 
-  resource :tesco_session, only: [:create, :destroy] do
+  resource :tesco_session, only: [:show, :create, :destroy] do
     post :complete, on: :member
     get  :poll,     on: :member
   end
