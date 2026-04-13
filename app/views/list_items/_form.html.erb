@@ -1,5 +1,8 @@
-<%= form_with model: list_item, url: local_assigns.fetch(:form_url, list_items_path), class: "flex gap-2" do |form| %>
+<%= form_with model: list_item, url: local_assigns.fetch(:form_url, list_items_path),
+      class: "flex gap-2",
+      data: { controller: "autofocus-form" } do |form| %>
   <%= form.text_field :freeform_text, required: true, autocomplete: "off",
-        placeholder: "Add an item", class: input_classes %>
+        placeholder: "Add an item", class: input_classes,
+        data: { autofocus_form_target: "input" } %>
   <%= form.submit "Add", class: button_classes(:primary, extra: "shrink-0") %>
 <% end %>
